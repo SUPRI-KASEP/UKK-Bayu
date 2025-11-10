@@ -71,10 +71,16 @@
         }
     }
 
+    .content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
 </style>
 <body>
     <nav class="navbar">
-    <div class="logo">UkkBayu</div>
+    <div class="logo">SmkYpc</div>
     <ul class="nav-links">
       <li><a href="#">Beranda</a></li>
       <li><a href="#">Tentang</a></li>
@@ -84,7 +90,7 @@
   </nav>
 
   <div class="content">
-    <h1>Selamat Datang di Website SMPN 1 Padakembang</h1>
+    <h1>Selamat Datang di Website SMK Ypc Tasikmalaya</h1>
     <p></p>
   </div>
 </body>
