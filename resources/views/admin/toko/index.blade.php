@@ -125,6 +125,73 @@
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
+
+  /* Responsif */
+  @media (max-width: 768px) {
+    .dashboard-content {
+      padding: 20px 15px;
+      margin: 15px auto;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+    }
+
+    .btn-primary {
+      padding: 10px 15px;
+      font-size: 14px;
+    }
+
+    .table {
+      font-size: 0.9rem;
+    }
+
+    td, th {
+      padding: 12px 10px !important;
+    }
+
+    .action-buttons {
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .dashboard-content {
+      padding: 15px 10px;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+    }
+
+    .d-flex {
+      flex-direction: column;
+      align-items: stretch !important;
+    }
+
+    .d-flex .btn-primary {
+      margin-top: 10px;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    .table {
+      min-width: 600px;
+    }
+
+    .action-buttons {
+      flex-direction: row;
+      justify-content: flex-start;
+    }
+  }
 </style>
 
 <div class="dashboard-content fade-in">
