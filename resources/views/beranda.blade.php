@@ -22,7 +22,7 @@
 
     /* Navbar utama */
     .navbar {
-        background-color: #1e293b; /* biru keabu-an */
+        background-color: #1e293b;
         color: white;
         display: flex;
         justify-content: space-between;
@@ -90,7 +90,7 @@
   </nav>
 
   <div class="content">
-    <h1>Selamat Datang di Website SMK Ypc Tasikmalaya</h1>
+    <h2>Selamat Datang di Website SMK Ypc Tasikmalaya</h2>
     <p></p>
   </div>
 </body>
