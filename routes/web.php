@@ -19,7 +19,7 @@ Route::get('admin/toko/create', [AdminTokoController::class, 'create'])->name('a
 Route::post('admin/toko', [AdminTokoController::class, 'store'])->name('admin.toko.store');
 Route::get('admin/toko/{toko}', [AdminTokoController::class, 'show'])->name('admin.toko.show');
 Route::get('admin/toko/{toko}/edit', [AdminTokoController::class, 'edit'])->name('admin.toko.edit');
-Route::put('admin/toko/{toko}', [AdminTokoController::class, 'update'])->name('admin.toko.update');
+Route::post('admin/toko/{toko}', [AdminTokoController::class, 'update'])->name('admin.toko.update');
 Route::delete('admin/toko/{toko}', [AdminTokoController::class, 'destroy'])->name('admin.toko.destroy');
 
 // Kategori routes
@@ -28,7 +28,7 @@ Route::get('admin/kategori/create', [AdminKategoriController::class, 'create'])-
 Route::post('admin/kategori', [AdminKategoriController::class, 'store'])->name('admin.kategori.store');
 Route::get('admin/kategori/{kategori}', [AdminKategoriController::class, 'show'])->name('admin.kategori.show');
 Route::get('admin/kategori/{kategori}/edit', [AdminKategoriController::class, 'edit'])->name('admin.kategori.edit');
-Route::put('admin/kategori/{kategori}', [AdminKategoriController::class, 'update'])->name('admin.kategori.update');
+Route::post('admin/kategori/{kategori}', [AdminKategoriController::class, 'update'])->name('admin.kategori.update');
 Route::delete('admin/kategori/{kategori}', [AdminKategoriController::class, 'destroy'])->name('admin.kategori.destroy');
 
 // Produk routes
@@ -37,7 +37,7 @@ Route::get('admin/produk/create', [AdminProdukController::class, 'create'])->nam
 Route::post('admin/produk', [AdminProdukController::class, 'store'])->name('admin.produk.store');
 Route::get('admin/produk/{produk}', [AdminProdukController::class, 'show'])->name('admin.produk.show');
 Route::get('admin/produk/{produk}/edit', [AdminProdukController::class, 'edit'])->name('admin.produk.edit');
-Route::put('admin/produk/{produk}', [AdminProdukController::class, 'update'])->name('admin.produk.update');
+Route::post('admin/produk/{produk}', [AdminProdukController::class, 'update'])->name('admin.produk.update');
 Route::delete('admin/produk/{produk}', [AdminProdukController::class, 'destroy'])->name('admin.produk.destroy');
 
 // User routes
@@ -46,5 +46,5 @@ Route::get('admin/user/create', [AdminUserController::class, 'create'])->name('a
 Route::post('admin/user', [AdminUserController::class, 'store'])->name('admin.user.store');
 Route::get('admin/user/{user}', [AdminUserController::class, 'show'])->name('admin.user.show');
 Route::get('admin/user/{user}/edit', [AdminUserController::class, 'edit'])->name('admin.user.edit');
-Route::put('admin/user/{user}', [AdminUserController::class, 'update'])->name('admin.user.update');
+Route::post('admin/user/{user}', [AdminUserController::class, 'update'])->name('admin.user.update');
 Route::delete('admin/user/{user}', [AdminUserController::class, 'destroy'])->name('admin.user.destroy');

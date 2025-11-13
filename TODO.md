@@ -30,3 +30,9 @@
 
 ## 7. Run Migrations
 - [x] Execute php artisan migrate to create tables
+
+## 8. Fix Migration Issues
+- [x] Resolve toko_kategori pivot table creation error by dropping existing table
+- [x] Add HasFactory trait to Produk model
+- [x] Revert routes back to individual routes (not using resource routes)
+- [x] Change PUT routes to POST routes for update operations

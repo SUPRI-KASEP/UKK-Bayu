@@ -5,57 +5,41 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Toko;
 use App\Models\Kategori;
-use App\Models\Produk;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Create admin user
+        User::create([
+            'name' => 'Administrator',
+            'username' => 'admin',
+            'email' => 'admin@example.com',
+            'password' => Hash::make('password123'),
+            'role' => 'admin',
         ]);
 
-        // Seed Toko
+        // Create member user
+        $member = User::create([
+            'name' => 'Test Member',
+            'username' => 'member',
+            'email' => 'member@example.com',
+            'password' => Hash::make('member123'),
+            'role' => 'user',
+        ]);
+
+        // Create toko for member
         Toko::create([
             'nama' => 'Toko ABC',
             'alamat' => 'Jl. Contoh No. 123',
-            'user_id' => 1,
-        ]);
-
-        Toko::create([
-            'nama' => 'Toko XYZ',
-            'alamat' => 'Jl. Lain No. 456',
-            'user_id' => 1,
+            'user_id' => $member->id,
         ]);
 
         // Seed Kategori
         Kategori::create(['nama' => 'Elektronik']);
         Kategori::create(['nama' => 'Pakaian']);
         Kategori::create(['nama' => 'Makanan']);
-
-        // Seed Produk
-        Produk::create([
-            'nama' => 'Laptop',
-            'harga' => 5000000,
-            'deskripsi' => 'Laptop gaming',
-            'kategori_id' => 1,
-            'toko_id' => 1,
-        ]);
-
-        Produk::create([
-            'nama' => 'Kaos',
-            'harga' => 50000,
-            'deskripsi' => 'Kaos katun',
-            'kategori_id' => 2,
-            'toko_id' => 2,
-        ]);
     }
 }
