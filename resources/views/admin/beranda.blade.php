@@ -133,6 +133,10 @@
       display: none;
     }
 
+    .logout {
+        margin-block-end: 10px;
+    }
+
     /* === MAIN CONTENT === */
     .main-content {
       flex: 1;
@@ -171,7 +175,8 @@
     }
 
     .toggle-btn,
-    .theme-btn {
+    .theme-btn,
+    .logout-btn {
       border: none;
       cursor: pointer;
       padding: 8px 12px;
@@ -201,6 +206,17 @@
 
     .theme-btn:hover {
       background-color: var(--accent-hover);
+      transform: scale(1.05);
+    }
+
+    .logout-btn {
+      background-color: #ef4444;
+      color: white;
+      box-shadow: 0 3px 6px var(--shadow);
+    }
+
+    .logout-btn:hover {
+      background-color: #dc2626;
       transform: scale(1.05);
     }
 
@@ -465,6 +481,12 @@
         <button class="theme-btn" onclick="toggleTheme()">
           <i class="bi bi-moon-stars"></i>
         </button>
+        <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+          @csrf
+          <button type="submit" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </form>
         <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
       </div>
     </div>

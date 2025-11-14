@@ -13,7 +13,6 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'username',
-        'email',
         'password',
         'role',
     ];
@@ -23,13 +22,6 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
 
     /**
      * Relationship dengan Toko
@@ -51,7 +43,7 @@ class User extends Authenticatable
     /**
      * Cek jika user adalah member
      */
-    public function isUser()
+    public function isMember()
     {
         return $this->role === 'user';
     }

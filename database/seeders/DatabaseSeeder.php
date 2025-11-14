@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Administrator',
             'username' => 'admin',
             'email' => 'admin@example.com',
-            'password' => Hash::make('password123'),
+            'password' => bcrypt('password123'),
             'role' => 'admin',
         ]);
 
@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test Member',
             'username' => 'member',
             'email' => 'member@example.com',
-            'password' => Hash::make('member123'),
+            'password' => bcrypt('member123'),
             'role' => 'user',
         ]);
 
