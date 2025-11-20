@@ -44,8 +44,8 @@ class AdminUserController extends Controller
             'role' => 'required|in:user,admin',
         ]);
 
-        // Jika role adalah user, validasi field toko
-        if ($request->role === 'user') {
+        // Jika role adalah user, validasi field toko jika diisi
+        if ($request->role === 'user' && $request->filled('toko_nama')) {
             $request->validate([
                 'toko_nama' => 'required|string|max:255',
                 'toko_alamat' => 'required|string',
@@ -64,8 +64,8 @@ class AdminUserController extends Controller
                 'role' => $request->role,
             ]);
 
-            // Jika user adalah member, buat toko untuknya
-            if ($request->role === 'user') {
+            // Jika user adalah member dan toko diisi, buat toko untuknya
+            if ($request->role === 'user' && $request->filled('toko_nama')) {
                 $toko = Toko::create([
                     'nama' => $request->toko_nama,
                     'alamat' => $request->toko_alamat,
@@ -120,18 +120,8 @@ class AdminUserController extends Controller
             'role' => 'required|in:user,admin',
         ]);
 
-        // Jika mengubah user menjadi member, validasi field toko
-        if ($request->role === 'user' && $user->role !== 'user') {
-            $request->validate([
-                'toko_nama' => 'required|string|max:255',
-                'toko_alamat' => 'required|string',
-                'kategori_ids' => 'required|array|min:1',
-                'kategori_ids.*' => 'exists:kategoris,id',
-            ]);
-        }
-
-        // Jika user adalah member dan tetap member, validasi field toko
-        if ($request->role === 'user' && $user->role === 'user') {
+        // Jika role adalah user dan toko diisi, validasi field toko
+        if ($request->role === 'user' && $request->filled('toko_nama')) {
             $request->validate([
                 'toko_nama' => 'required|string|max:255',
                 'toko_alamat' => 'required|string',
@@ -156,30 +146,39 @@ class AdminUserController extends Controller
 
             // Handle toko untuk user member
             if ($request->role === 'user') {
-                $toko = $user->toko;
+                if ($request->filled('toko_nama')) {
+                    $toko = $user->toko;
 
-                if ($toko) {
-                    // Update toko yang sudah ada
-                    $toko->update([
-                        'nama' => $request->toko_nama,
-                        'alamat' => $request->toko_alamat,
-                    ]);
+                    if ($toko) {
+                        // Update toko yang sudah ada
+                        $toko->update([
+                            'nama' => $request->toko_nama,
+                            'alamat' => $request->toko_alamat,
+                        ]);
 
-                    // Update kategori
-                    if ($request->has('kategori_ids')) {
-                        $toko->kategoris()->sync($request->kategori_ids);
+                        // Update kategori
+                        if ($request->has('kategori_ids')) {
+                            $toko->kategoris()->sync($request->kategori_ids);
+                        }
+                    } else {
+                        // Buat toko baru
+                        $toko = Toko::create([
+                            'nama' => $request->toko_nama,
+                            'alamat' => $request->toko_alamat,
+                            'user_id' => $user->id,
+                        ]);
+
+                        // Attach kategori
+                        if ($request->has('kategori_ids')) {
+                            $toko->kategoris()->attach($request->kategori_ids);
+                        }
                     }
                 } else {
-                    // Buat toko baru
-                    $toko = Toko::create([
-                        'nama' => $request->toko_nama,
-                        'alamat' => $request->toko_alamat,
-                        'user_id' => $user->id,
-                    ]);
-
-                    // Attach kategori
-                    if ($request->has('kategori_ids')) {
-                        $toko->kategoris()->attach($request->kategori_ids);
+                    // Jika toko tidak diisi, hapus toko jika ada
+                    if ($user->toko) {
+                        // Hapus relasi kategori terlebih dahulu
+                        $user->toko->kategoris()->detach();
+                        $user->toko->delete();
                     }
                 }
             } else {

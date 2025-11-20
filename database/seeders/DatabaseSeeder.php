@@ -16,8 +16,7 @@ class DatabaseSeeder extends Seeder
         User::create([
             'name' => 'Administrator',
             'username' => 'admin',
-            'email' => 'admin@example.com',
-            'password' => bcrypt('password123'),
+            'password' => bcrypt('ypc2025'),
             'role' => 'admin',
         ]);
 
@@ -25,9 +24,8 @@ class DatabaseSeeder extends Seeder
         $member = User::create([
             'name' => 'Test Member',
             'username' => 'member',
-            'email' => 'member@example.com',
             'password' => bcrypt('member123'),
-            'role' => 'user',
+            'role' => 'member',
         ]);
 
         // Create toko for member

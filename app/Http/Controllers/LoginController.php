@@ -27,6 +27,8 @@ class LoginController extends Controller
             // Redirect based on role
             if ($user->role == 'admin') {
                 return redirect()->route('admin.beranda');
+            } elseif ($user->role == 'member') {
+                return redirect()->route('member.beranda');
             } else {
                 return redirect()->route('beranda');
             }

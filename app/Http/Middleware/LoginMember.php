@@ -22,7 +22,7 @@ class LoginMember
             return redirect()->route('login');
         }
 
-        if (!Auth::user()->role == 'member') {
+        if (Auth::user()->role !== 'member') {
             Session::flash('error', 'Akses ditolak. Hanya untuk member.');
             return redirect()->route('beranda');
         }

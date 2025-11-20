@@ -90,7 +90,7 @@
                 <!-- Section untuk Member (akan muncul hanya jika role member dipilih) -->
                 <div id="member-section" style="display: none;">
                     <hr>
-                    <h5 class="mb-4"><i class="bi bi-shop"></i> Informasi Toko Member</h5>
+                    <h5 class="mb-4"><i class="bi bi-shop"></i> Informasi Toko Member (Opsional)</h5>
 
                     <div class="row">
                         <div class="col-md-6">
@@ -165,9 +165,9 @@
         function toggleMemberSection() {
             if (roleSelect.value === 'user') {
                 memberSection.style.display = 'block';
-                // Buat field toko_nama required
-                document.getElementById('toko_nama').required = true;
-                document.getElementById('toko_alamat').required = true;
+                // Field toko tidak required (opsional)
+                document.getElementById('toko_nama').required = false;
+                document.getElementById('toko_alamat').required = false;
             } else {
                 memberSection.style.display = 'none';
                 // Hapus required dari field toko

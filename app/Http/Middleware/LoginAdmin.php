@@ -22,7 +22,7 @@ class LoginAdmin
             return redirect()->route('login');
         }
 
-        if (!Auth::user()->role == 'admin') {
+        if (Auth::user()->role !== 'admin') {
             Session::flash('error', 'Akses ditolak. Hanya untuk admin.');
             return redirect()->route('beranda');
         }

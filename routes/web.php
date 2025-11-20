@@ -9,6 +9,8 @@ use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\BerandaCon;
 use App\Http\Controllers\DaftarCon;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\MemBerandaCon;
+use App\Http\Controllers\MemberBerandaCon;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [BerandaCon::class, 'index'])->name('beranda');
@@ -21,6 +23,11 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Pendaftaran
 Route::get('/pendaftaran', [DaftarCon::class, 'index'])->name('daftar');
+
+// Member
+Route::middleware('member')->group(function () {
+    Route::get('/member/beranda', [MemBerandaCon::class, 'index'])->name('member.beranda');
+});
 
 // Admin
 Route::middleware('admin')->group(function () {
