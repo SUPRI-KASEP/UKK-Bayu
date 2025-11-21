@@ -11,6 +11,8 @@ use App\Http\Controllers\DaftarCon;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MemBerandaCon;
 use App\Http\Controllers\MemberBerandaCon;
+use App\Http\Controllers\ProdukCon;
+use App\Http\Controllers\TokoCon;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [BerandaCon::class, 'index'])->name('beranda');
@@ -27,6 +29,8 @@ Route::get('/pendaftaran', [DaftarCon::class, 'index'])->name('daftar');
 // Member
 Route::middleware('member')->group(function () {
     Route::get('/member/beranda', [MemBerandaCon::class, 'index'])->name('member.beranda');
+    Route::get('/member/produk', [ProdukCon::class, 'index'])->name('member.produk');
+    Route::get('/member/toko', [TokoCon::class, 'index'])->name('member.toko');
 });
 
 // Admin

@@ -16,7 +16,8 @@
             <a class="navbar-brand" href="#">Member Dashboard</a>
             <div class="navbar-nav ms-auto">
                 <a href="{{ route('member.beranda') }}" class="nav-link">Beranda</a>
-                <a href="#" class="nav-link">Produk</a>
+                <a href="{{ route('member.produk') }}" class="nav-link">Produk</a>
+                <a href="{{ route('member.toko') }}" class="nav-link">Toko</a>
 
                 <form action="{{ route('logout') }}" method="POST" class="d-inline">
                     @csrf
