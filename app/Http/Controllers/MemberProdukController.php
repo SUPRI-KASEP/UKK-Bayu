@@ -12,8 +12,8 @@ class MemberProdukController extends Controller
 {
     public function index()
     {
-        $produk = Auth::user()->toko->produk ?? collect();
-        return view('member.produk.index', compact('produk'));
+        $produk = Auth::user()->toko->produks ?? collect();
+        return view('member.produk.dashboard', compact('produk'));
     }
 
     public function create()
@@ -41,7 +41,7 @@ class MemberProdukController extends Controller
 
         Produk::create($data);
 
-        return redirect()->route('member.produk.index')->with('success', 'Produk berhasil ditambahkan!');
+        return redirect()->route('member.produk')->with('success', 'Produk berhasil ditambahkan!');
     }
 
     public function edit(Produk $produk)
@@ -82,7 +82,7 @@ class MemberProdukController extends Controller
 
         $produk->update($data);
 
-        return redirect()->route('member.produk.index')->with('success', 'Produk berhasil diperbarui!');
+        return redirect()->route('member.produk')->with('success', 'Produk berhasil diperbarui!');
     }
 
     public function destroy(Produk $produk)
@@ -99,6 +99,6 @@ class MemberProdukController extends Controller
 
         $produk->delete();
 
-        return redirect()->route('member.produk.index')->with('success', 'Produk berhasil dihapus!');
+        return redirect()->route('member.produk')->with('success', 'Produk berhasil dihapus!');
     }
 }

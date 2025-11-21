@@ -86,17 +86,6 @@
                             
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="berat" class="form-label">Berat (gram) <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <input type="number" class="form-control" id="berat" name="berat" value="{{ old('berat') }}" min="0" required>
-                                        <span class="input-group-text">gram</span>
-                                    </div>
-                                    @error('berat')
-                                        <div class="text-danger">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                
-                                <div class="mb-3">
                                     <label for="gambar" class="form-label">Gambar Produk</label>
                                     <input type="file" class="form-control" id="gambar" name="gambar" accept="image/*">
                                     <div class="form-text">Format: JPG, PNG, JPEG. Maksimal 2MB</div>
@@ -391,7 +380,6 @@
                 const productDescription = productElement.querySelector('.card-text').textContent;
                 const productPrice = productElement.querySelector('.text-primary').textContent;
                 const productStock = productElement.querySelector('.badge.bg-success, .badge.bg-danger').textContent;
-                const productWeight = productElement.querySelector('.badge.bg-secondary').textContent;
                 const productImage = productElement.querySelector('.product-image').src;
 
                 const detailContent = `
@@ -404,7 +392,6 @@
                             <p><strong>${productCategory}</strong></p>
                             <p><strong>Harga:</strong> ${productPrice}</p>
                             <p><strong>${productStock}</strong></p>
-                            <p><strong>${productWeight}</strong></p>
                             <p><strong>Deskripsi:</strong></p>
                             <p>${productDescription}</p>
                         </div>

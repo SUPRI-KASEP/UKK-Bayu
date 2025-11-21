@@ -13,6 +13,7 @@ use App\Http\Controllers\MemBerandaCon;
 use App\Http\Controllers\MemberBerandaCon;
 use App\Http\Controllers\ProdukCon;
 use App\Http\Controllers\TokoCon;
+use App\Http\Controllers\MemberProdukController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [BerandaCon::class, 'index'])->name('beranda');
@@ -30,8 +31,11 @@ Route::get('/pendaftaran', [DaftarCon::class, 'index'])->name('daftar');
 Route::middleware('member')->group(function () {
     Route::get('/member/beranda', [MemBerandaCon::class, 'index'])->name('member.beranda');
     Route::get('/member/produk', [ProdukCon::class, 'index'])->name('member.produk');
-    Route::post('/produk', [ProdukCon::class, 'store'])->name('member.produk.store');
-    Route::delete('/produk/{id}', [ProdukCon::class, 'destroy'])->name('member.produk.destroy');
+
+    // Produk member
+    Route::get('/member/produk/create', [MemberProdukController::class, 'create'])->name('member.produk.create');
+    Route::post('/member/produk', [MemberProdukController::class, 'store'])->name('member.produk.store');
+    Route::delete('/member/produk/{produk}', [MemberProdukController::class, 'destroy'])->name('member.produk.destroy');
 
     // Toko member: lihat, buat, update
     Route::get('/member/toko', [TokoCon::class, 'index'])->name('member.toko');

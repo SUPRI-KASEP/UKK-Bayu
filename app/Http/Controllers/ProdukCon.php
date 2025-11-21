@@ -15,7 +15,13 @@ class ProdukCon extends Controller
     {
         $user = Auth::user();
         $produk = collect();
-        $kategori = Kategori::all(); // Untuk filter dan form
+        
+        // Cek jika tabel kategori ada
+        if (\Schema::hasTable('kategori')) {
+            $kategori = Kategori::all();
+        } else {
+            $kategori = collect();
+        }
 
         if ($user && $user->toko) {
             $produk = $user->toko->produks()->with('kategori')->latest()->get();
@@ -34,7 +40,13 @@ class ProdukCon extends Controller
                 ->with('error', 'Anda harus memiliki toko terlebih dahulu untuk menambah produk.');
         }
 
-        $kategori = Kategori::all();
+        // Cek jika tabel kategori ada
+        if (\Schema::hasTable('kategori')) {
+            $kategori = Kategori::all();
+        } else {
+            $kategori = collect();
+        }
+
         return view('member.produk.create', compact('kategori'));
     }
 
@@ -42,22 +54,30 @@ class ProdukCon extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        
+
         if (!$user->toko) {
             return redirect()->route('member.produk.index')
                 ->with('error', 'Anda harus memiliki toko terlebih dahulu untuk menambah produk.');
         }
 
-        $request->validate([
+        // Validasi conditional berdasarkan ada/tidaknya tabel kategori
+        $validationRules = [
             'nama' => 'required|string|max:255',
-            'kategori_id' => 'required|exists:kategoris,id',
             'harga' => 'required|integer|min:0',
             'stok' => 'required|integer|min:0',
-            'berat' => 'required|integer|min:0',
             'deskripsi' => 'nullable|string',
             'diskon' => 'nullable|integer|min:0|max:100',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-        ]);
+        ];
+
+        // Jika tabel kategori ada, tambahkan validasi untuk kategori_id
+        if (\Schema::hasTable('kategori')) {
+            $validationRules['kategori_id'] = 'required|exists:kategori,id';
+        } else {
+            $validationRules['kategori_id'] = 'nullable';
+        }
+
+        $request->validate($validationRules);
 
         try {
             $gambarPath = null;
@@ -65,17 +85,22 @@ class ProdukCon extends Controller
                 $gambarPath = $request->file('gambar')->store('produk', 'public');
             }
 
-            Produk::create([
+            $data = [
                 'nama' => $request->nama,
-                'kategori_id' => $request->kategori_id,
                 'harga' => $request->harga,
                 'stok' => $request->stok,
-                'berat' => $request->berat,
                 'diskon' => $request->diskon ?? 0,
                 'deskripsi' => $request->deskripsi,
                 'gambar' => $gambarPath,
                 'toko_id' => $user->toko->id
-            ]);
+            ];
+
+            // Jika tabel kategori ada, tambahkan kategori_id
+            if (\Schema::hasTable('kategori')) {
+                $data['kategori_id'] = $request->kategori_id;
+            }
+
+            Produk::create($data);
 
             return redirect()->route('member.produk.index')
                 ->with('success', 'Produk berhasil ditambahkan!');
@@ -97,7 +122,9 @@ class ProdukCon extends Controller
                 ->with('error', 'Anda harus memiliki toko terlebih dahulu.');
         }
 
-        $produk = Produk::with('kategori')
+        $produk = Produk::when(\Schema::hasTable('kategori'), function ($query) {
+                return $query->with('kategori');
+            })
             ->where('toko_id', $user->toko->id)
             ->findOrFail($id);
 
@@ -116,7 +143,13 @@ class ProdukCon extends Controller
 
         $produk = Produk::where('toko_id', $user->toko->id)
             ->findOrFail($id);
-        $kategori = Kategori::all();
+
+        // Cek jika tabel kategori ada
+        if (\Schema::hasTable('kategori')) {
+            $kategori = Kategori::all();
+        } else {
+            $kategori = collect();
+        }
 
         return view('member.produk.edit', compact('produk', 'kategori'));
     }
@@ -134,27 +167,39 @@ class ProdukCon extends Controller
         $produk = Produk::where('toko_id', $user->toko->id)
             ->findOrFail($id);
 
-        $request->validate([
+        // Validasi conditional berdasarkan ada/tidaknya tabel kategori
+        $validationRules = [
             'nama' => 'required|string|max:255',
-            'kategori_id' => 'required|exists:kategoris,id',
             'harga' => 'required|integer|min:0',
             'stok' => 'required|integer|min:0',
             'berat' => 'required|integer|min:0',
             'deskripsi' => 'nullable|string',
             'diskon' => 'nullable|integer|min:0|max:100',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-        ]);
+        ];
+
+        // Jika tabel kategori ada, tambahkan validasi untuk kategori_id
+        if (\Schema::hasTable('kategori')) {
+            $validationRules['kategori_id'] = 'required|exists:kategori,id';
+        } else {
+            $validationRules['kategori_id'] = 'nullable';
+        }
+
+        $request->validate($validationRules);
 
         try {
             $data = [
                 'nama' => $request->nama,
-                'kategori_id' => $request->kategori_id,
                 'harga' => $request->harga,
                 'stok' => $request->stok,
-                'berat' => $request->berat,
                 'diskon' => $request->diskon ?? 0,
                 'deskripsi' => $request->deskripsi,
             ];
+
+            // Jika tabel kategori ada, tambahkan kategori_id
+            if (\Schema::hasTable('kategori')) {
+                $data['kategori_id'] = $request->kategori_id;
+            }
 
             // Update gambar jika ada
             if ($request->hasFile('gambar')) {
@@ -206,4 +251,4 @@ class ProdukCon extends Controller
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
-}
+}   
