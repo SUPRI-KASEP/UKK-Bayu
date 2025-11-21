@@ -30,7 +30,13 @@ Route::get('/pendaftaran', [DaftarCon::class, 'index'])->name('daftar');
 Route::middleware('member')->group(function () {
     Route::get('/member/beranda', [MemBerandaCon::class, 'index'])->name('member.beranda');
     Route::get('/member/produk', [ProdukCon::class, 'index'])->name('member.produk');
+    Route::post('/produk', [ProdukCon::class, 'store'])->name('member.produk.store');
+    Route::delete('/produk/{id}', [ProdukCon::class, 'destroy'])->name('member.produk.destroy');
+
+    // Toko member: lihat, buat, update
     Route::get('/member/toko', [TokoCon::class, 'index'])->name('member.toko');
+    Route::post('/member/toko', [TokoCon::class, 'store'])->name('member.toko.store');
+    Route::post('/member/toko/update', [TokoCon::class, 'update'])->name('member.toko.update');
 });
 
 // Admin

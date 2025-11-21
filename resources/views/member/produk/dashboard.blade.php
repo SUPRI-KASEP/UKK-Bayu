@@ -1,7 +1,5 @@
 @extends('member.layout')
 @section('content')
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .product-image {
             max-height: 300px;
@@ -17,9 +15,118 @@
         .action-buttons .btn {
             margin-right: 5px;
         }
+        .image-preview {
+            max-height: 200px;
+            object-fit: cover;
+            display: none;
+        }
+        .form-section {
+            display: none;
+        }
+        .form-section.active {
+            display: block;
+        }
     </style>
-</head>
-<body>
+
+    <!-- Modal Tambah Produk -->
+    <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addProductModalLabel">Tambah Produk Baru</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="addProductForm" action="{{ route('member.produk.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="nama" class="form-label">Nama Produk <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="nama" name="nama" value="{{ old('nama') }}" required>
+                                    @error('nama')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="kategori_id" class="form-label">Kategori <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="kategori_id" name="kategori_id" required>
+                                        <option value="">Pilih Kategori</option>
+                                        @foreach($kategori as $kat)
+                                            <option value="{{ $kat->id }}" {{ old('kategori_id') == $kat->id ? 'selected' : '' }}>
+                                                {{ $kat->nama }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('kategori_id')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="harga" class="form-label">Harga <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">Rp</span>
+                                        <input type="number" class="form-control" id="harga" name="harga" value="{{ old('harga') }}" min="0" required>
+                                    </div>
+                                    @error('harga')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="stok" class="form-label">Stok <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="stok" name="stok" value="{{ old('stok') }}" min="0" required>
+                                    @error('stok')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="berat" class="form-label">Berat (gram) <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="berat" name="berat" value="{{ old('berat') }}" min="0" required>
+                                        <span class="input-group-text">gram</span>
+                                    </div>
+                                    @error('berat')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="gambar" class="form-label">Gambar Produk</label>
+                                    <input type="file" class="form-control" id="gambar" name="gambar" accept="image/*">
+                                    <div class="form-text">Format: JPG, PNG, JPEG. Maksimal 2MB</div>
+                                    <div class="mt-2">
+                                        <img id="imagePreview" class="image-preview img-thumbnail" alt="Preview Gambar">
+                                    </div>
+                                    @error('gambar')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="deskripsi" class="form-label">Deskripsi Produk</label>
+                            <textarea class="form-control" id="deskripsi" name="deskripsi" rows="4">{{ old('deskripsi') }}</textarea>
+                            @error('deskripsi')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Produk</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div class="container-fluid py-4">
         <div class="row">
             <div class="col-12">
@@ -30,8 +137,24 @@
                     </button>
                 </div>
 
-                <!-- Alert Notifikasi -->
-                <div id="alertContainer"></div>
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                @if($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
 
                 <!-- Filter dan Pencarian -->
                 <div class="row mb-4">
@@ -46,143 +169,92 @@
                     <div class="col-md-3">
                         <select class="form-select" id="categoryFilter">
                             <option value="">Semua Kategori</option>
-                            <option value="Elektronik">Elektronik</option>
-                            <option value="Pakaian">Pakaian</option>
-                            <option value="Makanan">Makanan</option>
-                            <option value="Perabotan">Perabotan</option>
+                            @foreach($kategori as $kat)
+                                <option value="{{ $kat->id }}">{{ $kat->nama }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="col-md-3">
                         <select class="form-select" id="sortBy">
-                            <option value="name">Urutkan berdasarkan Nama</option>
-                            <option value="price">Urutkan berdasarkan Harga</option>
-                            <option value="date">Urutkan berdasarkan Tanggal</option>
+                            <option value="terbaru">Terbaru</option>
+                            <option value="terlama">Terlama</option>
+                            <option value="harga_tertinggi">Harga Tertinggi</option>
+                            <option value="harga_terendah">Harga Terendah</option>
+                            <option value="stok_terbanyak">Stok Terbanyak</option>
                         </select>
                     </div>
                 </div>
 
                 <!-- Daftar Produk -->
                 <div class="row" id="productsContainer">
-                    <!-- Produk akan ditampilkan di sini secara dinamis -->
-                </div>
-
-                <!-- Pagination -->
-                <nav aria-label="Page navigation" class="mt-4">
-                    <ul class="pagination justify-content-center" id="paginationContainer">
-                        <!-- Pagination akan di-generate secara dinamis -->
-                    </ul>
-                </nav>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Tambah/Edit Produk -->
-    <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="productModalLabel">Tambah Produk Baru</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="productForm" enctype="multipart/form-data">
-                        <input type="hidden" id="productId" name="id">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="productName" class="form-label">Nama Produk</label>
-                                    <input type="text" class="form-control" id="productName" name="name" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="productCategory" class="form-label">Kategori</label>
-                                    <select class="form-select" id="productCategory" name="category" required>
-                                        <option value="">Pilih Kategori</option>
-                                        <option value="Elektronik">Elektronik</option>
-                                        <option value="Pakaian">Pakaian</option>
-                                        <option value="Makanan">Makanan</option>
-                                        <option value="Perabotan">Perabotan</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="productPrice" class="form-label">Harga</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">Rp</span>
-                                        <input type="number" class="form-control" id="productPrice" name="price" min="0" required>
+                    @forelse($produk as $p)
+                        <div class="col-md-6 col-lg-4 mb-4 product-item" 
+                             data-name="{{ strtolower($p->nama) }}" 
+                             data-category="{{ $p->kategori_id }}" 
+                             data-price="{{ $p->harga }}"
+                             data-stock="{{ $p->stok }}"
+                             data-date="{{ $p->created_at }}">
+                            <div class="card h-100">
+                                <img src="{{ $p->gambar ? asset('storage/'.$p->gambar) : 'https://via.placeholder.com/600x400?text=No+Image' }}" 
+                                     class="card-img-top product-image" alt="{{ $p->nama }}">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title mb-1">{{ $p->nama }}</h5>
+                                    <p class="text-muted mb-2">Kategori: {{ optional($p->kategori)->nama ?? '-' }}</p>
+                                    <p class="card-text flex-grow-1">{{ Str::limit($p->deskripsi, 120) }}</p>
+                                    <div class="mb-2">
+                                        <span class="badge bg-{{ $p->stok > 0 ? 'success' : 'danger' }}">
+                                            Stok: {{ $p->stok }}
+                                        </span>
+                                        <span class="badge bg-secondary ms-1">
+                                            Berat: {{ $p->berat }}g
+                                        </span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="text-primary mb-0">Rp {{ number_format($p->harga,0,',','.') }}</h5>
+                                        <div class="action-buttons">
+                                            <button class="btn btn-sm btn-outline-info view-product" data-id="{{ $p->id }}" title="Detail">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-primary edit-product" data-id="{{ $p->id }}" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <form action="{{ route('member.produk.destroy', $p->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus produk ini?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="productStock" class="form-label">Stok</label>
-                                    <input type="number" class="form-control" id="productStock" name="stock" min="0" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="productDescription" class="form-label">Deskripsi</label>
-                                    <textarea class="form-control" id="productDescription" name="description" rows="5"></textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="productImage" class="form-label">Gambar Produk</label>
-                                    <input type="file" class="form-control" id="productImage" name="image" accept="image/*">
-                                    <div class="form-text">Format yang didukung: JPG, PNG, GIF. Maksimal 2MB.</div>
-                                    <div id="imagePreview" class="mt-2"></div>
-                                </div>
                             </div>
                         </div>
-                    </form>
+                    @empty
+                        <div class="col-12 text-center py-5">
+                            <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Belum ada produk</h4>
+                            <p class="text-muted">Silakan tambahkan produk terlebih dahulu di toko Anda.</p>
+                        </div>
+                    @endforelse
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-primary" id="saveProductBtn">Simpan</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Modal Detail Produk -->
-    <div class="modal fade" id="productDetailModal" tabindex="-1" aria-labelledby="productDetailModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="productDetailModalLabel">Detail Produk</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <img id="detailImage" src="" alt="Gambar Produk" class="img-fluid rounded product-image">
-                        </div>
-                        <div class="col-md-6">
-                            <h4 id="detailName" class="mb-3"></h4>
-                            <p><strong>Kategori:</strong> <span id="detailCategory"></span></p>
-                            <p><strong>Harga:</strong> Rp <span id="detailPrice"></span></p>
-                            <p><strong>Stok:</strong> <span id="detailStock"></span></p>
-                            <p><strong>Deskripsi:</strong></p>
-                            <p id="detailDescription"></p>
+                <!-- Modal Detail Produk -->
+                <div class="modal fade" id="productDetailModal" tabindex="-1" aria-labelledby="productDetailModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="productDetailModalLabel">Detail Produk</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body" id="productDetailContent">
+                                <!-- Detail produk akan diisi via JavaScript -->
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Konfirmasi Hapus -->
-    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteConfirmModalLabel">Konfirmasi Hapus</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Apakah Anda yakin ingin menghapus produk ini?</p>
-                    <p class="text-danger"><strong>Perhatian:</strong> Tindakan ini tidak dapat dibatalkan.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Hapus</button>
                 </div>
             </div>
         </div>
@@ -190,436 +262,175 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Data produk contoh
-        let products = [
-            {
-                id: 1,
-                name: "Smartphone XYZ",
-                category: "Elektronik",
-                price: 2500000,
-                stock: 15,
-                description: "Smartphone dengan kamera 48MP, RAM 6GB, dan baterai 4000mAh.",
-                image: "https://via.placeholder.com/300x200?text=Smartphone+XYZ"
-            },
-            {
-                id: 2,
-                name: "Kaos Polos Premium",
-                category: "Pakaian",
-                price: 85000,
-                stock: 50,
-                description: "Kaos polos dengan bahan katun premium, nyaman dipakai seharian.",
-                image: "https://via.placeholder.com/300x200?text=Kaos+Polos"
-            },
-            {
-                id: 3,
-                name: "Kopi Arabica",
-                category: "Makanan",
-                price: 75000,
-                stock: 30,
-                description: "Kopi arabica pilihan dengan rasa yang khas dan aroma yang harum.",
-                image: "https://via.placeholder.com/300x200?text=Kopi+Arabica"
-            },
-            {
-                id: 4,
-                name: "Meja Kerja Minimalis",
-                category: "Perabotan",
-                price: 1200000,
-                stock: 5,
-                description: "Meja kerja dengan desain minimalis, cocok untuk ruang kerja modern.",
-                image: "https://via.placeholder.com/300x200?text=Meja+Kerja"
-            }
-        ];
-
-        // Variabel global
-        let currentPage = 1;
-        const productsPerPage = 6;
-        let currentProductId = null;
-
-        // Fungsi untuk menampilkan produk
-        function displayProducts(productsToDisplay = products) {
-            const container = document.getElementById('productsContainer');
-            container.innerHTML = '';
-
-            // Hitung indeks untuk pagination
-            const startIndex = (currentPage - 1) * productsPerPage;
-            const endIndex = startIndex + productsPerPage;
-            const paginatedProducts = productsToDisplay.slice(startIndex, endIndex);
-
-            if (paginatedProducts.length === 0) {
-                container.innerHTML = `
-                    <div class="col-12 text-center py-5">
-                        <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-                        <h4 class="text-muted">Tidak ada produk ditemukan</h4>
-                        <p class="text-muted">Coba ubah filter pencarian atau tambahkan produk baru.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            paginatedProducts.forEach(product => {
-                const productCard = `
-                    <div class="col-md-6 col-lg-4 mb-4">
-                        <div class="card h-100">
-                            <img src="${product.image}" class="card-img-top product-image" alt="${product.name}">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">${product.name}</h5>
-                                <p class="card-text">
-                                    <span class="badge bg-secondary">${product.category}</span>
-                                    <span class="badge ${product.stock > 0 ? 'bg-success' : 'bg-danger'}">
-                                        ${product.stock > 0 ? 'Stok: ' + product.stock : 'Stok Habis'}
-                                    </span>
-                                </p>
-                                <p class="card-text flex-grow-1">${product.description.substring(0, 100)}...</p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h5 class="text-primary">Rp ${product.price.toLocaleString('id-ID')}</h5>
-                                    <div class="action-buttons">
-                                        <button class="btn btn-sm btn-outline-info view-product" data-id="${product.id}">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-primary edit-product" data-id="${product.id}">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-danger delete-product" data-id="${product.id}">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.innerHTML += productCard;
-            });
-
-            // Setup event listeners untuk tombol aksi
-            setupActionButtons();
+        // Preview gambar saat memilih file
+        document.getElementById('gambar').addEventListener('change', function(e) {
+            const preview = document.getElementById('imagePreview');
+            const file = e.target.files[0];
             
-            // Update pagination
-            updatePagination(productsToDisplay.length);
-        }
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        });
 
-        // Fungsi untuk setup tombol aksi
-        function setupActionButtons() {
-            // Tombol lihat detail
+        // Filter dan pencarian produk
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const sortBy = document.getElementById('sortBy');
+            const productItems = document.querySelectorAll('.product-item');
+
+            function filterProducts() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const categoryValue = categoryFilter.value;
+                const sortValue = sortBy.value;
+
+                let filteredProducts = Array.from(productItems);
+
+                // Filter berdasarkan pencarian
+                if (searchTerm) {
+                    filteredProducts = filteredProducts.filter(item => {
+                        return item.getAttribute('data-name').includes(searchTerm);
+                    });
+                }
+
+                // Filter berdasarkan kategori
+                if (categoryValue) {
+                    filteredProducts = filteredProducts.filter(item => {
+                        return item.getAttribute('data-category') === categoryValue;
+                    });
+                }
+
+                // Sort produk
+                filteredProducts.sort((a, b) => {
+                    switch (sortValue) {
+                        case 'terbaru':
+                            return new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date'));
+                        case 'terlama':
+                            return new Date(a.getAttribute('data-date')) - new Date(b.getAttribute('data-date'));
+                        case 'harga_tertinggi':
+                            return parseInt(b.getAttribute('data-price')) - parseInt(a.getAttribute('data-price'));
+                        case 'harga_terendah':
+                            return parseInt(a.getAttribute('data-price')) - parseInt(b.getAttribute('data-price'));
+                        case 'stok_terbanyak':
+                            return parseInt(b.getAttribute('data-stock')) - parseInt(a.getAttribute('data-stock'));
+                        default:
+                            return 0;
+                    }
+                });
+
+                // Sembunyikan semua produk terlebih dahulu
+                productItems.forEach(item => {
+                    item.style.display = 'none';
+                });
+
+                // Tampilkan produk yang difilter
+                filteredProducts.forEach(item => {
+                    item.style.display = 'block';
+                });
+
+                // Jika tidak ada produk yang cocok
+                const container = document.getElementById('productsContainer');
+                const visibleProducts = container.querySelectorAll('.product-item[style="display: block"]');
+                
+                if (visibleProducts.length === 0) {
+                    if (!container.querySelector('.no-products-message')) {
+                        const noProducts = document.createElement('div');
+                        noProducts.className = 'col-12 text-center py-5 no-products-message';
+                        noProducts.innerHTML = `
+                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Tidak ada produk ditemukan</h4>
+                            <p class="text-muted">Coba ubah kata kunci pencarian atau filter kategori.</p>
+                        `;
+                        container.appendChild(noProducts);
+                    }
+                } else {
+                    const noProductsMessage = container.querySelector('.no-products-message');
+                    if (noProductsMessage) {
+                        noProductsMessage.remove();
+                    }
+                }
+            }
+
+            searchInput.addEventListener('input', filterProducts);
+            categoryFilter.addEventListener('change', filterProducts);
+            sortBy.addEventListener('change', filterProducts);
+
+            // Event listener untuk tombol detail produk
             document.querySelectorAll('.view-product').forEach(button => {
                 button.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    viewProduct(productId);
+                    const productId = this.getAttribute('data-id');
+                    showProductDetail(productId);
                 });
             });
 
-            // Tombol edit
+            // Event listener untuk tombol edit produk
             document.querySelectorAll('.edit-product').forEach(button => {
                 button.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
+                    const productId = this.getAttribute('data-id');
                     editProduct(productId);
                 });
             });
+        });
 
-            // Tombol hapus
-            document.querySelectorAll('.delete-product').forEach(button => {
-                button.addEventListener('click', function() {
-                    const productId = parseInt(this.getAttribute('data-id'));
-                    confirmDelete(productId);
-                });
-            });
-        }
+        // Fungsi untuk menampilkan detail produk
+        function showProductDetail(productId) {
+            // Dalam implementasi nyata, Anda akan mengambil data dari server
+            // Di sini kita akan menggunakan data yang sudah ada di halaman
+            
+            const productElement = document.querySelector(`.product-item[data-id="${productId}"]`);
+            if (productElement) {
+                const productName = productElement.querySelector('.card-title').textContent;
+                const productCategory = productElement.querySelector('.text-muted').textContent;
+                const productDescription = productElement.querySelector('.card-text').textContent;
+                const productPrice = productElement.querySelector('.text-primary').textContent;
+                const productStock = productElement.querySelector('.badge.bg-success, .badge.bg-danger').textContent;
+                const productWeight = productElement.querySelector('.badge.bg-secondary').textContent;
+                const productImage = productElement.querySelector('.product-image').src;
 
-        // Fungsi untuk melihat detail produk
-        function viewProduct(id) {
-            const product = products.find(p => p.id === id);
-            if (product) {
-                document.getElementById('detailName').textContent = product.name;
-                document.getElementById('detailCategory').textContent = product.category;
-                document.getElementById('detailPrice').textContent = product.price.toLocaleString('id-ID');
-                document.getElementById('detailStock').textContent = product.stock;
-                document.getElementById('detailDescription').textContent = product.description;
-                document.getElementById('detailImage').src = product.image;
-                
+                const detailContent = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <img src="${productImage}" class="img-fluid rounded" alt="${productName}">
+                        </div>
+                        <div class="col-md-6">
+                            <h4>${productName}</h4>
+                            <p><strong>${productCategory}</strong></p>
+                            <p><strong>Harga:</strong> ${productPrice}</p>
+                            <p><strong>${productStock}</strong></p>
+                            <p><strong>${productWeight}</strong></p>
+                            <p><strong>Deskripsi:</strong></p>
+                            <p>${productDescription}</p>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('productDetailContent').innerHTML = detailContent;
                 const modal = new bootstrap.Modal(document.getElementById('productDetailModal'));
                 modal.show();
             }
         }
 
-        // Fungsi untuk mengedit produk
-        function editProduct(id) {
-            const product = products.find(p => p.id === id);
-            if (product) {
-                document.getElementById('productId').value = product.id;
-                document.getElementById('productName').value = product.name;
-                document.getElementById('productCategory').value = product.category;
-                document.getElementById('productPrice').value = product.price;
-                document.getElementById('productStock').value = product.stock;
-                document.getElementById('productDescription').value = product.description;
-                
-                // Preview gambar
-                const imagePreview = document.getElementById('imagePreview');
-                imagePreview.innerHTML = `<img src="${product.image}" class="img-thumbnail" style="max-height: 150px;">`;
-                
-                document.getElementById('productModalLabel').textContent = 'Edit Produk';
-                const modal = new bootstrap.Modal(document.getElementById('productModal'));
-                modal.show();
-            }
+        // Fungsi untuk edit produk (placeholder)
+        function editProduct(productId) {
+            // Redirect ke halaman edit produk
+            window.location.href = `/member/produk/${productId}/edit`;
         }
 
-        // Fungsi untuk konfirmasi hapus produk
-        function confirmDelete(id) {
-            currentProductId = id;
-            const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-            modal.show();
-        }
-
-        // Fungsi untuk menambah produk baru
-        function addProduct() {
-            // Reset form
-            document.getElementById('productForm').reset();
-            document.getElementById('productId').value = '';
-            document.getElementById('imagePreview').innerHTML = '';
-            document.getElementById('productModalLabel').textContent = 'Tambah Produk Baru';
-            
-            const modal = new bootstrap.Modal(document.getElementById('productModal'));
-            modal.show();
-        }
-
-        // Fungsi untuk menyimpan produk (tambah/edit)
-        function saveProduct() {
-            const formData = new FormData(document.getElementById('productForm'));
-            const id = formData.get('id');
-            const name = formData.get('name');
-            const category = formData.get('category');
-            const price = parseInt(formData.get('price'));
-            const stock = parseInt(formData.get('stock'));
-            const description = formData.get('description');
-            const imageFile = document.getElementById('productImage').files[0];
-
-            // Validasi
-            if (!name || !category || !price || !stock) {
-                showAlert('Harap isi semua field yang wajib diisi!', 'danger');
-                return;
-            }
-
-            if (id) {
-                // Edit produk yang sudah ada
-                const index = products.findIndex(p => p.id === parseInt(id));
-                if (index !== -1) {
-                    products[index] = {
-                        ...products[index],
-                        name,
-                        category,
-                        price,
-                        stock,
-                        description
-                    };
-                    
-                    // Jika ada gambar baru, update gambar
-                    if (imageFile) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            products[index].image = e.target.result;
-                            displayProducts();
-                        };
-                        reader.readAsDataURL(imageFile);
-                    } else {
-                        displayProducts();
-                    }
-                    
-                    showAlert('Produk berhasil diperbarui!', 'success');
-                }
-            } else {
-                // Tambah produk baru
-                const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-                const newProduct = {
-                    id: newId,
-                    name,
-                    category,
-                    price,
-                    stock,
-                    description,
-                    image: 'https://via.placeholder.com/300x200?text=Produk+Baru'
-                };
-                
-                // Jika ada gambar, gunakan gambar yang diupload
-                if (imageFile) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        newProduct.image = e.target.result;
-                        products.push(newProduct);
-                        displayProducts();
-                    };
-                    reader.readAsDataURL(imageFile);
-                } else {
-                    products.push(newProduct);
-                    displayProducts();
-                }
-                
-                showAlert('Produk berhasil ditambahkan!', 'success');
-            }
-            
-            // Tutup modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('productModal'));
-            modal.hide();
-        }
-
-        // Fungsi untuk menghapus produk
-        function deleteProduct() {
-            products = products.filter(p => p.id !== currentProductId);
-            displayProducts();
-            showAlert('Produk berhasil dihapus!', 'success');
-            
-            // Tutup modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
-            modal.hide();
-            
-            currentProductId = null;
-        }
-
-        // Fungsi untuk mencari produk
-        function searchProducts() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const categoryFilter = document.getElementById('categoryFilter').value;
-            
-            let filteredProducts = products;
-            
-            // Filter berdasarkan pencarian
-            if (searchTerm) {
-                filteredProducts = filteredProducts.filter(product => 
-                    product.name.toLowerCase().includes(searchTerm) || 
-                    product.description.toLowerCase().includes(searchTerm)
-                );
-            }
-            
-            // Filter berdasarkan kategori
-            if (categoryFilter) {
-                filteredProducts = filteredProducts.filter(product => 
-                    product.category === categoryFilter
-                );
-            }
-            
-            // Urutkan produk
-            const sortBy = document.getElementById('sortBy').value;
-            if (sortBy === 'name') {
-                filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
-            } else if (sortBy === 'price') {
-                filteredProducts.sort((a, b) => a.price - b.price);
-            } else if (sortBy === 'date') {
-                // Untuk contoh, kita anggap produk dengan ID lebih tinggi adalah yang lebih baru
-                filteredProducts.sort((a, b) => b.id - a.id);
-            }
-            
-            // Reset ke halaman pertama
-            currentPage = 1;
-            displayProducts(filteredProducts);
-        }
-
-        // Fungsi untuk update pagination
-        function updatePagination(totalProducts) {
-            const totalPages = Math.ceil(totalProducts / productsPerPage);
-            const paginationContainer = document.getElementById('paginationContainer');
-            paginationContainer.innerHTML = '';
-
-            if (totalPages <= 1) return;
-
-            // Tombol Previous
-            const prevLi = document.createElement('li');
-            prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
-            prevLi.innerHTML = `<a class="page-link" href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>`;
-            prevLi.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (currentPage > 1) {
-                    currentPage--;
-                    displayProducts();
-                }
-            });
-            paginationContainer.appendChild(prevLi);
-
-            // Nomor halaman
-            for (let i = 1; i <= totalPages; i++) {
-                const pageLi = document.createElement('li');
-                pageLi.className = `page-item ${i === currentPage ? 'active' : ''}`;
-                pageLi.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-                pageLi.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    currentPage = i;
-                    displayProducts();
-                });
-                paginationContainer.appendChild(pageLi);
-            }
-
-            // Tombol Next
-            const nextLi = document.createElement('li');
-            nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
-            nextLi.innerHTML = `<a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>`;
-            nextLi.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    displayProducts();
-                }
-            });
-            paginationContainer.appendChild(nextLi);
-        }
-
-        // Fungsi untuk menampilkan alert
-        function showAlert(message, type) {
-            const alertContainer = document.getElementById('alertContainer');
-            const alertId = 'alert-' + Date.now();
-            
-            const alertHtml = `
-                <div id="${alertId}" class="alert alert-${type} alert-dismissible fade show" role="alert">
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            `;
-            
-            alertContainer.innerHTML = alertHtml;
-            
-            // Auto dismiss setelah 5 detik
-            setTimeout(() => {
-                const alertElement = document.getElementById(alertId);
-                if (alertElement) {
-                    const bsAlert = new bootstrap.Alert(alertElement);
-                    bsAlert.close();
-                }
-            }, 5000);
-        }
-
-        // Event listeners saat halaman dimuat
+        // Auto-hide alert setelah 5 detik
         document.addEventListener('DOMContentLoaded', function() {
-            // Tampilkan produk
-            displayProducts();
-            
-            // Event listener untuk tombol tambah produk
-            document.querySelector('[data-bs-target="#addProductModal"]').addEventListener('click', addProduct);
-            
-            // Event listener untuk tombol simpan produk
-            document.getElementById('saveProductBtn').addEventListener('click', saveProduct);
-            
-            // Event listener untuk tombol konfirmasi hapus
-            document.getElementById('confirmDeleteBtn').addEventListener('click', deleteProduct);
-            
-            // Event listener untuk pencarian
-            document.getElementById('searchButton').addEventListener('click', searchProducts);
-            document.getElementById('searchInput').addEventListener('keyup', function(e) {
-                if (e.key === 'Enter') {
-                    searchProducts();
-                }
-            });
-            
-            // Event listener untuk filter dan sort
-            document.getElementById('categoryFilter').addEventListener('change', searchProducts);
-            document.getElementById('sortBy').addEventListener('change', searchProducts);
-            
-            // Event listener untuk preview gambar
-            document.getElementById('productImage').addEventListener('change', function() {
-                const file = this.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        document.getElementById('imagePreview').innerHTML = 
-                            `<img src="${e.target.result}" class="img-thumbnail" style="max-height: 150px;">`;
-                    };
-                    reader.readAsDataURL(file);
-                }
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 5000);
             });
         });
     </script>

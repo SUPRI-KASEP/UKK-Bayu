@@ -28,6 +28,13 @@ class DatabaseSeeder extends Seeder
             'role' => 'member',
         ]);
 
+        $member = User::create([
+            'name' => 'Test Member',
+            'username' => 'bayu',
+            'password' => bcrypt('member123'),
+            'role' => 'member',
+        ]);
+
         // Create toko for member
         Toko::create([
             'nama' => 'Toko ABC',

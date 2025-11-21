@@ -16,6 +16,7 @@ class Toko extends Model
         'nama',
         'alamat',
         'user_id',
+        'gambar',
     ];
 
     /**
