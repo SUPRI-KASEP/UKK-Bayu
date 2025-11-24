@@ -15,8 +15,9 @@ class Toko extends Model
     protected $fillable = [
         'nama',
         'alamat',
-        'user_id',
+        'kontak',
         'gambar',
+        'user_id',
     ];
 
     /**

@@ -10,23 +10,26 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    /**
+     * Kolom yang boleh diisi.
+     */
     protected $fillable = [
         'name',
         'username',
-        'email',
         'password',
         'role',
     ];
 
+    /**
+     * Kolom yang disembunyikan saat serialisasi.
+     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-
     /**
-     * Relationship dengan Toko
-     * User bisa memiliki satu toko (jika role user/member)
+     * Relasi user memiliki satu toko.
      */
     public function toko()
     {
@@ -34,7 +37,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Cek jika user adalah admin
+     * Cek apakah user adalah admin.
      */
     public function isAdmin()
     {
@@ -42,7 +45,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Cek jika user adalah member
+     * Cek apakah user adalah member.
      */
     public function isMember()
     {

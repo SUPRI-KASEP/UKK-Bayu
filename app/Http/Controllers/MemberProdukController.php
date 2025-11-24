@@ -12,27 +12,37 @@ class MemberProdukController extends Controller
 {
     public function index()
     {
-        $produk = Auth::user()->toko->produks ?? collect();
-        return view('member.produk.dashboard', compact('produk'));
+        $toko = Auth::user()->toko;
+
+        if (!$toko) {
+            return redirect()->route('member.toko')
+                    ->with('warning', 'Anda harus memiliki toko terlebih dahulu.');
+        }
+
+        $produk = Produk::where('toko_id', $toko->id)->get();
+        $kategoris = Kategori::all();
+
+        return view('member.produk.dashboard', compact('produk', 'kategoris'));
     }
 
     public function create()
     {
-        $kategori = Kategori::all();
-        return view('member.produk.create', compact('kategori'));
+        $kategoris = Kategori::all();
+        return view('member.produk.create', compact('kategoris'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required|string|max:255',
-            'deskripsi' => 'required|string',
+            'nama' => 'required|max:255',
+            'deskripsi' => 'required',
             'harga' => 'required|numeric|min:0',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'stok' => 'required|integer|min:0',
             'kategori_id' => 'required|exists:kategori,id',
+            'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        $data = $request->only(['nama', 'deskripsi', 'harga', 'kategori_id']);
+        $data = $request->only(['nama', 'deskripsi', 'harga', 'stok', 'kategori_id']);
         $data['toko_id'] = Auth::user()->toko->id;
 
         if ($request->hasFile('gambar')) {
@@ -46,34 +56,32 @@ class MemberProdukController extends Controller
 
     public function edit(Produk $produk)
     {
-        // Pastikan produk milik toko user yang sedang login
         if ($produk->toko_id !== Auth::user()->toko->id) {
             abort(403);
         }
 
-        $kategori = Kategori::all();
-        return view('member.produk.edit', compact('produk', 'kategori'));
+        $kategoris = Kategori::all();
+        return view('member.produk.edit', compact('produk', 'kategoris'));
     }
 
     public function update(Request $request, Produk $produk)
     {
-        // Pastikan produk milik toko user yang sedang login
         if ($produk->toko_id !== Auth::user()->toko->id) {
             abort(403);
         }
 
         $request->validate([
-            'nama' => 'required|string|max:255',
-            'deskripsi' => 'required|string',
+            'nama' => 'required|max:255',
+            'deskripsi' => 'required',
             'harga' => 'required|numeric|min:0',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'stok' => 'required|integer|min:0',
             'kategori_id' => 'required|exists:kategori,id',
+            'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
 
-        $data = $request->only(['nama', 'deskripsi', 'harga', 'kategori_id']);
+        $data = $request->only(['nama', 'deskripsi', 'harga', 'stok', 'kategori_id']);
 
         if ($request->hasFile('gambar')) {
-            // Hapus gambar lama jika ada
             if ($produk->gambar) {
                 Storage::disk('public')->delete($produk->gambar);
             }
@@ -87,12 +95,10 @@ class MemberProdukController extends Controller
 
     public function destroy(Produk $produk)
     {
-        // Pastikan produk milik toko user yang sedang login
         if ($produk->toko_id !== Auth::user()->toko->id) {
             abort(403);
         }
 
-        // Hapus gambar jika ada
         if ($produk->gambar) {
             Storage::disk('public')->delete($produk->gambar);
         }

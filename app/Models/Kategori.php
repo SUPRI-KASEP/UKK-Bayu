@@ -9,26 +9,23 @@ class Kategori extends Model
 {
     use HasFactory;
 
-    // Tentukan nama tabel secara eksplisit
+    // Tentukan nama tabel
     protected $table = 'kategori';
 
-    protected $fillable = [
-        'nama',
-    ];
+    protected $fillable = ['nama'];
 
-    /**
-     * Relationship dengan Produk
-     */
     public function produks()
     {
-        return $this->hasMany(Produk::class);
+        return $this->hasMany(Produk::class, 'kategori_id');
     }
 
-    /**
-     * Relationship many-to-many dengan Toko
-     */
     public function tokos()
     {
-        return $this->belongsToMany(Toko::class, 'toko_kategori', 'kategori_id', 'toko_id');
+        return $this->belongsToMany(
+            Toko::class,
+            'toko_kategori',
+            'kategori_id',
+            'toko_id'
+        );
     }
 }

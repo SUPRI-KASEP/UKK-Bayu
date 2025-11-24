@@ -54,6 +54,10 @@
                                     <textarea name="alamat" class="form-control" rows="3" required>{{ old('alamat') }}</textarea>
                                 </div>
                                 <div class="mb-3">
+                                    <label class="form-label">Kontak</label>
+                                    <input type="text" name="kontak" value="{{ old('kontak') }}" class="form-control" placeholder="Nomor telepon/WhatsApp">
+                                </div>
+                                <div class="mb-3">
                                     <label class="form-label">Gambar/Logo Toko</label>
                                     <input type="file" name="gambar" class="form-control" accept="image/*">
                                     <small class="text-muted">Format: jpeg, png, jpg, gif, webp. Maks 2MB</small>
@@ -78,6 +82,7 @@
                         <div class="card-body">
                             <form action="{{ route('member.toko.update') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
+                                @method('PUT')
                                 <div class="mb-3">
                                     <label class="form-label">Nama Toko</label>
                                     <input type="text" name="nama" value="{{ old('nama', $toko->nama) }}" class="form-control" required>
@@ -85,6 +90,11 @@
                                 <div class="mb-3">
                                     <label class="form-label">Alamat</label>
                                     <textarea name="alamat" class="form-control" rows="3" required>{{ old('alamat', $toko->alamat) }}</textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Kontak</label>
+                                    <input type="text" name="kontak" value="{{ old('kontak', $toko->kontak) }}" class="form-control" placeholder="Nomor telepon/WhatsApp">
+                                    <small class="text-muted">Isi nomor telepon atau kontak lainnya</small>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Gambar/Logo Toko</label>
@@ -113,7 +123,8 @@
                                 <img class="img-fluid store-cover" src="{{ $toko->gambar ? asset('storage/'.$toko->gambar) : 'https://via.placeholder.com/1200x400?text=Logo+Toko' }}" alt="Gambar Toko">
                             </div>
                             <div class="mb-2"><strong>Nama:</strong> {{ $toko->nama }}</div>
-                            <div class="mb-0"><strong>Alamat:</strong> {{ $toko->alamat }}</div>
+                            <div class="mb-2"><strong>Alamat:</strong> {{ $toko->alamat }}</div>
+                            <div class="mb-0"><strong>Kontak:</strong> {{ $toko->kontak ?: 'Tidak ada' }}</div>
                         </div>
                     </div>
 

@@ -1,25 +1,21 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Produk;
 use App\Models\Kategori;
+use App\Models\Toko;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 
-class BerandaCon extends Controller
+class BerandaController extends Controller
 {
-    //
     public function index() {
-        $user = Auth::user();
-        $toko = $user->toko;
-        
-        if (!$toko) {
-            return redirect()->route('member.toko')->with('warning', 'Anda harus memiliki toko terlebih dahulu.');
-        }
-
-        $produk = $toko->produks ?? collect();
+        // Ambil semua produk dengan relasi toko dan kategori
+        $produk = Produk::with(['toko', 'kategori'])->get();
         $kategoris = Kategori::all();
+        
         return view('beranda', compact('produk', 'kategoris'));
     }
 }

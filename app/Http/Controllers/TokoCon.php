@@ -28,6 +28,7 @@ class TokoCon extends Controller
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'alamat' => 'required|string|max:500',
+            'kontak' => 'nullable|string|max:255',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
@@ -36,6 +37,9 @@ class TokoCon extends Controller
             'alamat' => $validated['alamat'],
             'user_id' => $user->id,
         ];
+
+        // Handle kontak - gunakan null jika tidak ada
+        $data['kontak'] = $validated['kontak'] ?? null;
 
         if ($request->hasFile('gambar')) {
             $data['gambar'] = $request->file('gambar')->store('toko', 'public');
@@ -58,6 +62,7 @@ class TokoCon extends Controller
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'alamat' => 'required|string|max:500',
+            'kontak' => 'nullable|string|max:255',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
@@ -65,6 +70,9 @@ class TokoCon extends Controller
             'nama' => $validated['nama'],
             'alamat' => $validated['alamat'],
         ];
+
+        // Handle kontak - gunakan null jika tidak ada
+        $updateData['kontak'] = $validated['kontak'] ?? null;
 
         if ($request->hasFile('gambar')) {
             if ($toko->gambar) {

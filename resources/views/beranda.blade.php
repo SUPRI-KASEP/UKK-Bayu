@@ -555,46 +555,59 @@
     <section class="products">
         <h2 class="section-title">Produk Unggulan</h2>
         <div class="products-grid">
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Kaos Custom">
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">Kaos Custom SMK YPC</h3>
-                    <div class="product-price">Rp 75.000</div>
-                    <div class="product-actions">
-                        <button class="btn btn-primary btn-sm"><i class="fas fa-shopping-cart"></i> Beli</button>
-                        <button class="btn btn-outline btn-sm">Detail</button>
+        @forelse($produk as $p)
+            <div class="col-md-6 col-lg-3 mb-4 product-item" 
+                 data-id="{{ $p->id }}"
+                 data-name="{{ strtolower($p->nama) }}" 
+                 data-category="{{ $p->kategori_id }}" 
+                 data-price="{{ $p->harga }}"
+                 data-stock="{{ $p->stok }}"
+                 data-date="{{ $p->created_at->format('Y-m-d H:i:s') }}">
+                <div class="card h-100">
+                    <img src="{{ $p->gambar ? asset('storage/'.$p->gambar) : 'https://via.placeholder.com/600x400?text=No+Image' }}" 
+                         class="card-img-top product-image" alt="{{ $p->nama }}" style="height: 200px; object-fit: cover;">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title mb-1">{{ $p->nama }}</h5>
+                        <p class="text-muted mb-2">Kategori: {{ $p->kategori->nama ?? '-' }}</p>
+                        <p class="card-text flex-grow-1">{{ Str::limit($p->deskripsi, 120) }}</p>
+                        <div class="mb-2">
+                            <span class="badge bg-{{ $p->stok > 0 ? 'success' : 'danger' }}">
+                                Stok: {{ $p->stok }}
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="text-primary mb-0">Rp {{ number_format($p->harga, 0, ',', '.') }}</h5>
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-outline-info view-product" data-id="{{ $p->id }}" title="Detail">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <a href="{{ route('member.produk.edit', $p->id) }}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ route('member.produk.destroy', $p->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus produk ini?')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Kue Kering">
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">Kue Kering Lebaran</h3>
-                    <div class="product-price">Rp 45.000</div>
-                    <div class="product-actions">
-                        <button class="btn btn-primary btn-sm"><i class="fas fa-shopping-cart"></i> Beli</button>
-                        <button class="btn btn-outline btn-sm">Detail</button>
-                    </div>
-                </div>
+            
+            {{-- Membuat baris baru setiap 4 produk --}}
+            @if(($loop->iteration) % 4 == 0 && !$loop->last)
+                </div><div class="row">
+            @endif
+        @empty
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">Belum ada produk</h4>
+                <p class="text-muted">Silakan tambahkan produk terlebih dahulu di toko Anda.</p>
             </div>
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1586953208448-b95a79798f07?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Web Design">
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">Jasa Desain Web</h3>
-                    <div class="product-price">Rp 500.000</div>
-                    <div class="product-actions">
-                        <button class="btn btn-primary btn-sm"><i class="fas fa-shopping-cart"></i> Beli</button>
-                        <button class="btn btn-outline btn-sm">Detail</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        @endforelse
     </section>
 
     <!-- CTA -->

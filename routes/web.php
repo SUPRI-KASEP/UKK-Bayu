@@ -7,79 +7,83 @@ use App\Http\Controllers\AdminKategoriController;
 use App\Http\Controllers\AdminProdukController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\BerandaCon;
+use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\DaftarCon;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MemBerandaCon;
 use App\Http\Controllers\MemberBerandaCon;
-use App\Http\Controllers\ProdukCon;
 use App\Http\Controllers\TokoCon;
 use App\Http\Controllers\MemberProdukController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [BerandaCon::class, 'index'])->name('beranda');
+Route::get('/', [BerandaController::class, 'index'])->name('beranda');
 
 // Login routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-
 // Pendaftaran
-Route::get('/pendaftaran', [DaftarCon::class, 'index'])->name('daftar');
+Route::get('/daftar', [LoginController::class, 'showRegisterForm'])->name('daftar');
+Route::post('/daftar', [LoginController::class, 'register'])->name('daftar.post');
 
 // Member
-Route::middleware('member')->group(function () {
-    Route::get('/member/beranda', [MemBerandaCon::class, 'index'])->name('member.beranda');
-    Route::get('/member/produk', [ProdukCon::class, 'index'])->name('member.produk');
+Route::middleware(['auth', 'member'])->group(function () {
 
-    // Produk member
+    Route::get('/member/beranda', [MemBerandaCon::class, 'index'])->name('member.beranda');
+
+    // Produk Member
+    Route::get('/member/produk', [MemberProdukController::class, 'index'])->name('member.produk');
     Route::get('/member/produk/create', [MemberProdukController::class, 'create'])->name('member.produk.create');
     Route::post('/member/produk', [MemberProdukController::class, 'store'])->name('member.produk.store');
+    Route::get('/member/produk/{produk}/edit', [MemberProdukController::class, 'edit'])->name('member.produk.edit');
+    Route::put('/member/produk/{produk}', [MemberProdukController::class, 'update'])->name('member.produk.update');
     Route::delete('/member/produk/{produk}', [MemberProdukController::class, 'destroy'])->name('member.produk.destroy');
 
-    // Toko member: lihat, buat, update
+    // Toko Member
     Route::get('/member/toko', [TokoCon::class, 'index'])->name('member.toko');
     Route::post('/member/toko', [TokoCon::class, 'store'])->name('member.toko.store');
-    Route::post('/member/toko/update', [TokoCon::class, 'update'])->name('member.toko.update');
+    Route::put('/member/toko/update', [TokoCon::class, 'update'])->name('member.toko.update');
 });
 
+
 // Admin
-Route::middleware('admin')->group(function () {
+Route::middleware(['auth', 'admin'])->group(function () { // TAMBAH 'auth'
     Route::get('/admin/beranda', [AdminBerandaCon::class, 'index'])->name('admin.beranda');
 
-    // Toko routes
+    // Toko routes - PERBAIKI METHOD UPDATE
     Route::get('admin/toko', [AdminTokoController::class, 'index'])->name('admin.toko.index');
     Route::get('admin/toko/create', [AdminTokoController::class, 'create'])->name('admin.toko.create');
     Route::post('admin/toko', [AdminTokoController::class, 'store'])->name('admin.toko.store');
     Route::get('admin/toko/{toko}', [AdminTokoController::class, 'show'])->name('admin.toko.show');
     Route::get('admin/toko/{toko}/edit', [AdminTokoController::class, 'edit'])->name('admin.toko.edit');
-    Route::post('admin/toko/{toko}', [AdminTokoController::class, 'update'])->name('admin.toko.update');
+    Route::put('admin/toko/{toko}', [AdminTokoController::class, 'update'])->name('admin.toko.update'); // UBAH POST KE PUT
     Route::delete('admin/toko/{toko}', [AdminTokoController::class, 'destroy'])->name('admin.toko.destroy');
 
-    // Kategori routes
+    // Kategori routes - PERBAIKI METHOD UPDATE
     Route::get('admin/kategori', [AdminKategoriController::class, 'index'])->name('admin.kategori.index');
     Route::get('admin/kategori/create', [AdminKategoriController::class, 'create'])->name('admin.kategori.create');
     Route::post('admin/kategori', [AdminKategoriController::class, 'store'])->name('admin.kategori.store');
     Route::get('admin/kategori/{kategori}', [AdminKategoriController::class, 'show'])->name('admin.kategori.show');
     Route::get('admin/kategori/{kategori}/edit', [AdminKategoriController::class, 'edit'])->name('admin.kategori.edit');
-    Route::post('admin/kategori/{kategori}', [AdminKategoriController::class, 'update'])->name('admin.kategori.update');
+    Route::put('admin/kategori/{kategori}', [AdminKategoriController::class, 'update'])->name('admin.kategori.update'); // UBAH POST KE PUT
     Route::delete('admin/kategori/{kategori}', [AdminKategoriController::class, 'destroy'])->name('admin.kategori.destroy');
 
-    // Produk routes
+    // Produk routes - PERBAIKI METHOD UPDATE
     Route::get('admin/produk', [AdminProdukController::class, 'index'])->name('admin.produk.index');
     Route::get('admin/produk/create', [AdminProdukController::class, 'create'])->name('admin.produk.create');
     Route::post('admin/produk', [AdminProdukController::class, 'store'])->name('admin.produk.store');
     Route::get('admin/produk/{produk}', [AdminProdukController::class, 'show'])->name('admin.produk.show');
     Route::get('admin/produk/{produk}/edit', [AdminProdukController::class, 'edit'])->name('admin.produk.edit');
-    Route::post('admin/produk/{produk}', [AdminProdukController::class, 'update'])->name('admin.produk.update');
+    Route::put('admin/produk/{produk}', [AdminProdukController::class, 'update'])->name('admin.produk.update'); // UBAH POST KE PUT
     Route::delete('admin/produk/{produk}', [AdminProdukController::class, 'destroy'])->name('admin.produk.destroy');
 
-    // User routes
+    // User routes - PERBAIKI METHOD UPDATE
     Route::get('admin/user', [AdminUserController::class, 'index'])->name('admin.user.index');
     Route::get('admin/user/create', [AdminUserController::class, 'create'])->name('admin.user.create');
     Route::post('admin/user', [AdminUserController::class, 'store'])->name('admin.user.store');
     Route::get('admin/user/{user}', [AdminUserController::class, 'show'])->name('admin.user.show');
     Route::get('admin/user/{user}/edit', [AdminUserController::class, 'edit'])->name('admin.user.edit');
-    Route::post('admin/user/{user}', [AdminUserController::class, 'update'])->name('admin.user.update');
+    Route::put('admin/user/{user}', [AdminUserController::class, 'update'])->name('admin.user.update'); // UBAH POST KE PUT
     Route::delete('admin/user/{user}', [AdminUserController::class, 'destroy'])->name('admin.user.destroy');
 });
