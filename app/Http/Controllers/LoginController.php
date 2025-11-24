@@ -1,9 +1,9 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
 class LoginController extends Controller
@@ -24,7 +24,7 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-
+            
             // Redirect based on role
             if ($user->role == 'admin') {
                 return redirect()->route('admin.beranda');
@@ -39,6 +39,7 @@ class LoginController extends Controller
             'username' => 'Username atau password salah.',
         ])->withInput($request->only('username'));
     }
+
     public function showRegisterForm()
     {
         return view('daftar');
@@ -52,24 +53,23 @@ class LoginController extends Controller
             'password' => 'required|min:6',
         ]);
 
+        // GUNAKAN Hash::make() DARI bcrypt()
         User::create([
             'name' => $request->name,
             'username' => $request->username,
-            'password' => bcrypt($request->password),
+            'password' => Hash::make($request->password), // PERBAIKI: Hash::make()
             'role' => 'member',
         ]);
 
         return redirect()->route('login')->with('success', 'Akun berhasil didaftarkan');
     }
 
-
-
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
+        
         return redirect()->route('beranda');
     }
 }

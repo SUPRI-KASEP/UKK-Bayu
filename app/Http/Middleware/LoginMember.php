@@ -1,4 +1,5 @@
 <?php
+// app/Http/Middleware/LoginMember.php
 
 namespace App\Http\Middleware;
 
@@ -10,11 +11,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LoginMember
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
         if (!Auth::check()) {
