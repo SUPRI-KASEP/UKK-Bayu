@@ -19,9 +19,10 @@
     <table class="table table-hover align-middle">
       <thead>
         <tr>
-          <th style="width: 10%">ID</th>
-          <th style="width: 25%">Nama</th>
-          <th style="width: 45%">Alamat</th>
+          <th style="width: 8%">ID</th>
+          <th style="width: 22%">Nama</th>
+          <th style="width: 35%">Alamat</th>
+          <th style="width: 15%">Kontak</th>
           <th class="text-center" style="width: 20%">Aksi</th>
         </tr>
       </thead>
@@ -31,6 +32,20 @@
           <td><span class="badge">{{ $toko->id }}</span></td>
           <td class="fw-semibold">{{ $toko->nama }}</td>
           <td>{{ $toko->alamat }}</td>
+
+          {{-- KONTak toko --}}
+          <td>
+            @if($toko->kontak)
+              <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $toko->kontak) }}" 
+                 target="_blank" 
+                 class="text-success fw-semibold">
+                <i class="bi bi-telephone"></i> {{ $toko->kontak }}
+              </a>
+            @else
+              <span class="text-muted fst-italic">Tidak ada</span>
+            @endif
+          </td>
+
           <td class="text-center">
             <div class="action-buttons">
               <a href="{{ route('admin.toko.show', $toko->id) }}" class="btn btn-info btn-sm">
@@ -51,7 +66,7 @@
         </tr>
         @empty
         <tr>
-          <td colspan="4" class="text-center empty-row py-5">Belum ada data toko.</td>
+          <td colspan="5" class="text-center empty-row py-5">Belum ada data toko.</td>
         </tr>
         @endforelse
       </tbody>

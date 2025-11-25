@@ -53,6 +53,16 @@ class MemberProdukController extends Controller
 
         return redirect()->route('member.produk')->with('success', 'Produk berhasil ditambahkan!');
     }
+    public function show(Produk $produk)
+    {
+        // Pastikan hanya pemilik toko yang bisa melihat
+        if ($produk->toko_id !== Auth::user()->toko->id) {
+            abort(403);
+        }
+
+        return view('member.produk.show', compact('produk'));
+    }
+
 
     public function edit(Produk $produk)
     {

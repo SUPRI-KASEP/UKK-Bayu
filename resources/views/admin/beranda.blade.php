@@ -18,7 +18,6 @@
     }
 
     :root {
-      /* Light Theme */
       --bg: #f8fafc;
       --sidebar-bg: #ffffff;
       --sidebar-text: #334155;
@@ -37,28 +36,6 @@
       --table-header-text: #ffffff;
       --table-row-hover: #f8fafc;
       --badge-bg: #64748b;
-    }
-
-    body.dark {
-      /* Dark Theme */
-      --bg: #0f172a;
-      --sidebar-bg: #1e293b;
-      --sidebar-text: #e2e8f0;
-      --sidebar-hover: #334155;
-      --text: #cbd5e1;
-      --card-bg: #1e293b;
-      --accent: #60a5fa;
-      --accent-hover: #3b82f6;
-      --judul: #f8fafc;
-      --shadow: rgba(0, 0, 0, 0.2);
-      --border: #334155;
-      --success-bg: #0f5132;
-      --success-border: #16a34a;
-      --success-text: #d1e7dd;
-      --table-header-bg: #334155;
-      --table-header-text: #f8fafc;
-      --table-row-hover: #334155;
-      --badge-bg: #475569;
     }
 
     body {
@@ -133,10 +110,6 @@
       display: none;
     }
 
-    .logout {
-        margin-block-end: 10px;
-    }
-
     /* === MAIN CONTENT === */
     .main-content {
       flex: 1;
@@ -175,7 +148,6 @@
     }
 
     .toggle-btn,
-    .theme-btn,
     .logout-btn {
       border: none;
       cursor: pointer;
@@ -196,17 +168,6 @@
 
     .toggle-btn:hover {
       background-color: var(--sidebar-hover);
-    }
-
-    .theme-btn {
-      background-color: var(--accent);
-      color: white;
-      box-shadow: 0 3px 6px var(--shadow);
-    }
-
-    .theme-btn:hover {
-      background-color: var(--accent-hover);
-      transform: scale(1.05);
     }
 
     .logout-btn {
@@ -232,14 +193,8 @@
     }
 
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .dashboard-content h2 {
@@ -248,20 +203,7 @@
       font-weight: 600;
     }
 
-    .dashboard-content p {
-      color: var(--text);
-      line-height: 1.7;
-    }
-
-    .selamat h2 {
-      color: var(--judul);
-    }
-
-    .selamat p {
-      color: var(--text);
-    }
-
-    /* === COMPONENT STYLES (Untuk semua halaman) === */
+    /* === COMPONENTS === */
     .component-content {
       background-color: var(--card-bg);
       padding: 40px 50px;
@@ -309,20 +251,9 @@
       font-size: 1.1rem;
     }
 
-    .table tbody tr {
-      transition: all 0.2s ease;
-      background-color: var(--card-bg);
-    }
-
     .table tbody tr:hover {
       background-color: var(--table-row-hover);
       transform: scale(1.01);
-    }
-
-    .table td, .table th {
-      padding: 16px 20px !important;
-      vertical-align: middle;
-      border-color: var(--border);
     }
 
     .alert-success {
@@ -335,46 +266,6 @@
       border-radius: 10px;
     }
 
-    .btn {
-      border-radius: 10px;
-      font-size: 15px;
-      padding: 8px 14px;
-      font-weight: 500;
-      transition: all 0.25s ease;
-      border: none;
-    }
-
-    .btn-info {
-      background-color: #06b6d4;
-      color: #fff;
-    }
-
-    .btn-warning {
-      background-color: #facc15;
-      color: #000;
-    }
-
-    .btn-danger {
-      background-color: #ef4444;
-      color: #fff;
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      opacity: 0.9;
-    }
-
-    .action-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .empty-row {
-      font-size: 1.1rem;
-      color: var(--text);
-    }
-
     .badge {
       background-color: var(--badge-bg);
       color: white;
@@ -382,53 +273,23 @@
       border-radius: 6px;
     }
 
-    .fade-in {
-      animation: fadeIn 0.7s ease-in-out;
-    }
-
     /* === RESPONSIVE === */
     @media (max-width: 768px) {
-      .sidebar {
-        transform: translateX(-100%);
-        width: 250px;
-      }
+      .sidebar { transform: translateX(-100%); width: 250px; }
+      .sidebar.show { transform: translateX(0); }
+      .sidebar.collapsed { transform: translateX(-100%); }
 
-      .sidebar.show {
-        transform: translateX(0);
-      }
-
-      .sidebar.collapsed {
-        transform: translateX(-100%);
-      }
-
-      .main-content {
-        margin-left: 0;
-        padding: 20px;
-      }
-
-      .component-content {
-        padding: 20px 15px;
-        margin: 15px auto;
-      }
-
-      .component-content h2 {
-        font-size: 1.5rem;
-      }
+      .main-content { margin-left: 0; padding: 20px; }
 
       .overlay {
         display: none;
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        inset: 0;
         background: rgba(0, 0, 0, 0.5);
         z-index: 80;
       }
 
-      .overlay.active {
-        display: block;
-      }
+      .overlay.active { display: block; }
     }
 
     @media (max-width: 480px) {
@@ -436,22 +297,8 @@
         padding: 15px 10px;
       }
 
-      .component-content h2 {
-        font-size: 1.3rem;
-      }
-
-      .d-flex {
-        flex-direction: column;
-        align-items: stretch !important;
-      }
-
-      .d-flex .btn-primary {
-        margin-top: 10px;
-      }
-
       .action-buttons {
         flex-direction: column;
-        gap: 5px;
       }
     }
   </style>
@@ -470,7 +317,7 @@
     </ul>
   </div>
 
-  <!-- Overlay for Mobile -->
+  <!-- Overlay Mobile -->
   <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
   <!-- Main Content -->
@@ -478,34 +325,31 @@
     <div class="topbar">
       <h3>Beranda Admin</h3>
       <div class="actions">
-        <button class="theme-btn" onclick="toggleTheme()">
-          <i class="bi bi-moon-stars"></i>
-        </button>
+
         <form action="{{ route('logout') }}" method="POST" style="display: inline;">
           @csrf
           <button type="submit" class="logout-btn">
             <i class="fas fa-sign-out-alt"></i> Logout
           </button>
         </form>
+
         <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
       </div>
     </div>
 
     <div class="dashboard-content">
-      <div class="selamat">
-        <h2>Selamat Datang di Dashboard Admin</h2>
-        <p>
-          Gunakan menu di sisi kiri untuk mengelola data
-          <strong>Toko</strong>, <strong>Produk</strong>,
-          <strong>Kategori</strong>, dan <strong>User</strong>.
-        </p>
-      </div>
+      <h2>Selamat Datang di Dashboard Admin</h2>
+      <p>
+        Gunakan menu di sisi kiri untuk mengelola data
+        <strong>Toko</strong>, <strong>Produk</strong>,
+        <strong>Kategori</strong>, dan <strong>User</strong>.
+      </p>
       @yield('content')
     </div>
   </div>
 
   <script>
-    // Toggle Sidebar (Desktop & Mobile)
+    // Toggle Sidebar
     function toggleSidebar() {
       const sidebar = document.getElementById("sidebar");
       const overlay = document.getElementById("overlay");
@@ -523,28 +367,9 @@
       }
     }
 
-    // Toggle Theme
-    function toggleTheme() {
-      document.body.classList.toggle("dark");
-      const icon = document.querySelector(".theme-btn i");
-      icon.classList.toggle("bi-sun");
-      icon.classList.toggle("bi-moon-stars");
-      localStorage.setItem(
-        "theme",
-        document.body.classList.contains("dark") ? "dark" : "light"
-      );
-    }
-
-    // Load saved theme/sidebar
+    // Restore sidebar state
     document.addEventListener("DOMContentLoaded", function () {
-      const theme = localStorage.getItem("theme");
       const sidebarState = localStorage.getItem("sidebar");
-      const icon = document.querySelector(".theme-btn i");
-
-      if (theme === "dark") {
-        document.body.classList.add("dark");
-        icon.classList.replace("bi-moon-stars", "bi-sun");
-      }
 
       if (sidebarState === "collapsed" && window.innerWidth > 768) {
         document.getElementById("sidebar").classList.add("collapsed");
