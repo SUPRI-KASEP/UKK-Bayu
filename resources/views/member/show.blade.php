@@ -19,7 +19,7 @@
             <p><strong>Stok:</strong> {{ $produk->stok }}</p>
             <p><strong>Deskripsi:</strong></p>
             <p>{{ $produk->deskripsi }}</p>
-            <a href="{{ route('member.beranda') }}" class="btn btn-secondary mt-3">Kembali</a>
+            <a href="/" class="btn btn-secondary mt-3">Kembali</a>
         </div>
     </div>
 </div>

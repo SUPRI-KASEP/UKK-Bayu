@@ -9,6 +9,7 @@ use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MemBerandaCon;
+use App\Http\Controllers\showBerandaCon;
 use App\Http\Controllers\MemberProdukController;
 use App\Http\Controllers\TokoCon;
 use Illuminate\Support\Facades\Route;
@@ -26,14 +27,16 @@ Route::get('/daftar', [LoginController::class, 'showRegisterForm'])->name('dafta
 Route::post('/daftar', [LoginController::class, 'register'])->name('daftar.post');
 
 // Member Route
+
+    Route::get('/show/produk{produk}', [showBerandaCon::class, 'show'])->name('produk.show');
 Route::middleware(['auth', 'member'])->group(function () {
     Route::get('/member/beranda', [MemBerandaCon::class, 'index'])->name('member.beranda');
     
     // Produk Member
     Route::get('/member/produk', [MemberProdukController::class, 'index'])->name('member.produk');
     Route::get('/member/produk/create', [MemberProdukController::class, 'create'])->name('member.produk.create');
-    Route::post('/member/produk', [MemberProdukController::class, 'store'])->name('member.produk.store');
     Route::get('/member/produk/{produk}', [MemberProdukController::class, 'show'])->name('member.produk.show');
+    Route::post('/member/produk', [MemberProdukController::class, 'store'])->name('member.produk.store');
     Route::get('/member/produk/{produk}/edit', [MemberProdukController::class, 'edit'])->name('member.produk.edit');
     Route::put('/member/produk/{produk}', [MemberProdukController::class, 'update'])->name('member.produk.update');
     Route::delete('/member/produk/{produk}', [MemberProdukController::class, 'destroy'])->name('member.produk.destroy');
@@ -47,6 +50,13 @@ Route::middleware(['auth', 'member'])->group(function () {
 // Admin Route
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/beranda', [AdminBerandaCon::class, 'index'])->name('admin.beranda');
+
+    Route::get('/admin/pengajuan', [AdminBerandaCon::class, 'pengajuan'])->name('admin.pengajuan');
+    Route::post('/admin/toko/{id}/setujui', [AdminBerandaCon::class, 'setujui'])
+        ->name('admin.toko.setujui');
+
+    Route::post('/admin/toko/{id}/tolak', [AdminBerandaCon::class, 'tolak'])
+        ->name('admin.toko.tolak');
     
     // Toko routes
     Route::get('admin/toko', [AdminTokoController::class, 'index'])->name('admin.toko.index');

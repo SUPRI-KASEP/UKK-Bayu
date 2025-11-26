@@ -18,7 +18,11 @@ class AdminUserController extends Controller
     public function index()
     {
         $users = User::with('toko')->latest()->get();
-        return view('admin.user.index', compact('users'));
+        return view('admin.user.index', compact('users'),[
+            'jumlahToko' => Toko::count(),
+            'jumlahKategori' => Kategori::count(),
+            'jumlahUser' => User::count()
+        ]);
     }
 
     /**

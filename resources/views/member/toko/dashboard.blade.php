@@ -133,9 +133,18 @@
                             <h6 class="mb-0">Aksi</h6>
                         </div>
                         <div class="card-body">
+                            @if($toko->status === 'setuju')
+
                             <a href="{{ route('member.produk') }}" class="btn btn-outline-primary w-100">
                                 <i class="fas fa-box me-1"></i> Kelola Produk
                             </a>
+                            @else
+                            <button class="btn btn-outline-secondary w-100" disabled>
+                                <i class="fas fa-lock me-1"></i> Menunggu Persetujuan Admin
+                            </button>
+                            
+                            @endif
+
                         </div>
                     </div>
                 </div>

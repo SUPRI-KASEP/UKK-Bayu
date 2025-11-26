@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('alamat')->nullable();
             $table->string('kontak')->nullable();
             $table->string('gambar')->nullable();
+            $table->enum('status',['setuju' , 'menunggu' , 'tidak disetujui'])->nullable();
             $table->timestamps();
         });
     }

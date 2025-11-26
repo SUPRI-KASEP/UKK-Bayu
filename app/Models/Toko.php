@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,8 +19,13 @@ class Toko extends Model
         'kontak',
         'gambar',
         'user_id',
+        'pemilik',
+        'status',
     ];
 
+    protected $attributes = [
+        'status' => 'menunggu'
+    ];
     /**
      * Relationship dengan User
      */

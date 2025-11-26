@@ -3,7 +3,7 @@
 @section('content')
 <div class="dashboard-content">
   <h2>Edit Produk</h2>
-  <form action="{{ route('admin.produk.update', $produk) }}" method="POST">
+  <form action="{{ route('admin.produk.update', $produk) }}" method="POST" enctype="multipart/form-data">
     @csrf
     @method('PUT')
     <div class="form-group">

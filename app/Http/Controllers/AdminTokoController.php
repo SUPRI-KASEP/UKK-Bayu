@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kategori;
 use App\Models\Toko;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -15,7 +16,11 @@ class AdminTokoController extends Controller
     public function index()
     {
         $tokos = Toko::all();
-        return view('admin.toko.index', compact('tokos'));
+        return view('admin.toko.index', compact('tokos'),[
+            'jumlahToko' => Toko::count(),
+            'jumlahKategori' => Kategori::count(),
+            'jumlahUser' => User::count()
+        ]);
     }
 
     /**

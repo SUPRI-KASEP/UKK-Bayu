@@ -578,20 +578,19 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="text-primary mb-0">Rp {{ number_format($p->harga, 0, ',', '.') }}</h5>
                             <div class="action-buttons">
-                                <button class="btn btn-sm btn-outline-info view-product" data-id="{{ $p->id }}" title="Detail">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <a href="{{ route('member.produk.edit', $p->id) }}" class="btn btn-sm btn-outline-primary" title="Edit">
-                                    <i class="fas fa-edit"></i>
+                                
+                                <a href="https://wa.me/{{ $p->toko->kontak ?? '' }}?text={{ urlencode('Halo, saya ingin membeli produk '.$p->nama.' dari toko '.$p->toko->nama) }}"
+                                       target="_blank"
+                                       class="btn btn-sm btn-success"
+                                       title="Chat Penjual">
+                                        <i class="fab fa-whatsapp"></i>
                                 </a>
-                                <form action="{{ route('member.produk.destroy', $p->id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus" onclick="return confirm('Apakah Anda yakin ingin menghapus produk ini?')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
+                            <a href="{{ route('produk.show', $p->id) }}" class="btn btn-sm btn-outline-info">
+                                <i class="fas fa-eye"></i> Lihat
+                            </a>
+
+                        </div>
+
                         </div>
                     </div>
                 </div>

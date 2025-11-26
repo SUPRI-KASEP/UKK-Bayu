@@ -9,7 +9,6 @@ use App\Models\Toko;
 
 class TokoCon extends Controller
 {
-    // Halaman toko member: tampilkan form create jika belum ada, atau form edit jika sudah ada
     public function index()
     {
         $user = Auth::user();
@@ -17,12 +16,13 @@ class TokoCon extends Controller
         return view('member.toko.dashboard', compact('toko'));
     }
 
-    // Simpan toko baru untuk member (maksimal 1 toko per user)
     public function store(Request $request)
     {
         $user = Auth::user();
+
         if ($user->toko) {
-            return redirect()->route('member.toko')->with('warning', 'Anda sudah memiliki toko.');
+            return redirect()->route('member.toko')
+                ->with('warning', 'Anda sudah memiliki toko.');
         }
 
         $validated = $request->validate([
@@ -35,11 +35,10 @@ class TokoCon extends Controller
         $data = [
             'nama' => $validated['nama'],
             'alamat' => $validated['alamat'],
+            'kontak' => $validated['kontak'] ?? null,
             'user_id' => $user->id,
+            'status' => 'menunggu'
         ];
-
-        // Handle kontak - gunakan null jika tidak ada
-        $data['kontak'] = $validated['kontak'] ?? null;
 
         if ($request->hasFile('gambar')) {
             $data['gambar'] = $request->file('gambar')->store('toko', 'public');
@@ -47,14 +46,15 @@ class TokoCon extends Controller
 
         Toko::create($data);
 
-        return redirect()->route('member.toko')->with('success', 'Toko berhasil dibuat.');
+        return redirect()->route('member.toko')
+            ->with('success', 'Toko berhasil diajukan dan menunggu persetujuan admin.');
     }
 
-    // Update toko milik member termasuk gambar toko
     public function update(Request $request)
     {
         $user = Auth::user();
         $toko = $user->toko;
+
         if (!$toko) {
             return redirect()->route('member.toko')->with('warning', 'Anda belum memiliki toko.');
         }
@@ -69,10 +69,9 @@ class TokoCon extends Controller
         $updateData = [
             'nama' => $validated['nama'],
             'alamat' => $validated['alamat'],
+            'kontak' => $validated['kontak'] ?? null,
+            'status' => 'menunggu'
         ];
-
-        // Handle kontak - gunakan null jika tidak ada
-        $updateData['kontak'] = $validated['kontak'] ?? null;
 
         if ($request->hasFile('gambar')) {
             if ($toko->gambar) {
@@ -83,6 +82,7 @@ class TokoCon extends Controller
 
         $toko->update($updateData);
 
-        return redirect()->route('member.toko')->with('success', 'Toko berhasil diperbarui.');
+        return redirect()->route('member.toko')
+            ->with('success', 'Toko berhasil diperbarui dan menunggu persetujuan admin.');
     }
 }
