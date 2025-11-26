@@ -11,13 +11,12 @@ return new class extends Migration
         Schema::create('toko_kategori', function (Blueprint $table) {
             $table->id();
 
-            // Sesuaikan dengan nama tabel yang sebenarnya
             $table->foreignId('toko_id')
-                  ->constrained('toko') // nama tabel: 'toko' bukan 'tokos'
+                  ->constrained('toko') 
                   ->onDelete('cascade');
 
             $table->foreignId('kategori_id')
-                  ->constrained('kategori') // nama tabel: 'kategori' bukan 'kategoris'
+                  ->constrained('kategori') 
                   ->onDelete('cascade');
 
             $table->timestamps();

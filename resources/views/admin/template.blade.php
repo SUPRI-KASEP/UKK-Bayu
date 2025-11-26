@@ -352,7 +352,7 @@
       <li><a href="{{ route('admin.produk.index') }}"><i class="fas fa-box"></i><span>Produk</span></a></li>
       <li><a href="{{ route('admin.kategori.index') }}"><i class="fas fa-tags"></i><span>Kategori</span></a></li>
       <li><a href="{{ route('admin.user.index') }}"><i class="fas fa-user"></i><span>User</span></a></li>
-      <li><a href="{{ route('admin.pengajuan') }}"><i class="bi bi-hourglass-split"></i> Pengajuan Toko</a></li>
+      <li><a href="{{ route('admin.pengajuan') }}"></a></li>
     </ul>
   </div>
 

@@ -18,4 +18,5 @@ class BerandaController extends Controller
         
         return view('beranda', compact('produk', 'kategoris'));
     }
+
 }

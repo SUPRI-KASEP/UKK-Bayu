@@ -26,6 +26,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/daftar', [LoginController::class, 'showRegisterForm'])->name('daftar');
 Route::post('/daftar', [LoginController::class, 'register'])->name('daftar.post');
 
+
 // Member Route
 
     Route::get('/show/produk{produk}', [showBerandaCon::class, 'show'])->name('produk.show');

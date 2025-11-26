@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        html {scroll-behavior: smooth;}
+
         :root {
             --primary: #1e293b;
             --secondary: #38bdf8;
@@ -237,6 +239,16 @@
             box-shadow: 0 15px 30px rgba(56, 189, 248, 0.2);
         }
 
+        .category-card.active {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        .category-card.active .category-icon {
+            color: white;
+        }
+
         .category-icon {
             font-size: 2.5rem;
             color: var(--secondary);
@@ -464,6 +476,20 @@
             transform: translateX(0);
         }
 
+        /* Filter Styles */
+        .filter-active {
+            background: var(--secondary) !important;
+            color: white !important;
+        }
+
+        .product-item {
+            transition: all 0.3s ease;
+        }
+
+        .product-item.hidden {
+            display: none;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .nav-links {
@@ -498,18 +524,18 @@
             <span>Marketplace SMK YPC</span>
         </div>
         <ul class="nav-links">
-            <li><a href="#">Beranda</a></li>
-            <li><a href="#">Produk</a></li>
-            <li><a href="#">Kategori</a></li>
-            <li><a href="#">Tentang</a></li>
+            <li><a href="#home">Beranda</a></li>
+            <li><a href="#produk">Produk</a></li>
+            <li><a href="#kategori">Kategori</a></li>
+            <li><a href="#tentang">Tentang</a></li>
         </ul>
         <div class="auth-section">
-            <a href="{{ route('login') }}"class="btn btn-primary">Login</a>
+            <a href="{{ route('login') }}" class="btn btn-primary">Login</a>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero">
+    <section class="hero" id="home">
         <div class="hero-content">
             <h1>Karya Kreatif Siswa SMK YPC</h1>
             <p>Temukan produk unik dan berkualitas langsung dari bakat siswa kami</p>
@@ -521,28 +547,34 @@
     </section>
 
     <!-- Categories -->
-    <section class="categories">
+    <section class="categories" id="kategori">
         <h2 class="section-title">Kategori Produk</h2>
         <div class="categories-grid">
-            <div class="category-card">
+            <div class="category-card active" data-category="all">
+                <div class="category-icon">
+                    <i class="fas fa-th-large"></i>
+                </div>
+                <h3>Semua</h3>
+            </div>
+            <div class="category-card" data-category="fashion">
                 <div class="category-icon">
                     <i class="fas fa-tshirt"></i>
                 </div>
                 <h3>Fashion</h3>
             </div>
-            <div class="category-card">
+            <div class="category-card" data-category="makanan">
                 <div class="category-icon">
                     <i class="fas fa-utensils"></i>
                 </div>
                 <h3>Makanan</h3>
             </div>
-            <div class="category-card">
+            <div class="category-card" data-category="teknologi">
                 <div class="category-icon">
                     <i class="fas fa-laptop"></i>
                 </div>
                 <h3>Teknologi</h3>
             </div>
-            <div class="category-card">
+            <div class="category-card" data-category="kerajinan">
                 <div class="category-icon">
                     <i class="fas fa-paint-brush"></i>
                 </div>
@@ -552,71 +584,59 @@
     </section>
 
     <!-- Products -->
-    <section class="products">
+    <section class="products" id="produk">
         <h2 class="section-title">Produk Unggulan</h2>
         <div class="products-grid">
-        @forelse($produk as $p)
-            <div class="col-md-6 col-lg-3 mb-4 product-item" 
-                 data-id="{{ $p->id }}"
-                 data-name="{{ strtolower($p->nama) }}" 
-                 data-category="{{ $p->kategori_id }}" 
-                 data-price="{{ $p->harga }}"
-                 data-stock="{{ $p->stok }}"
-                 data-date="{{ $p->created_at->format('Y-m-d H:i:s') }}">
-                <div class="card h-100">
-                    <img src="{{ $p->gambar ? asset('storage/'.$p->gambar) : 'https://via.placeholder.com/600x400?text=No+Image' }}" 
-                         class="card-img-top product-image" alt="{{ $p->nama }}" style="height: 200px; object-fit: cover;">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title mb-1">{{ $p->nama }}</h5>
+            @forelse($produk as $p)
+                <div class="product-card product-item" 
+                     data-category="{{ strtolower($p->kategori->nama ?? 'lainnya') }}"
+                     data-name="{{ strtolower($p->nama) }}">
+                    <div class="product-image">
+                        <img src="{{ $p->gambar ? asset('storage/'.$p->gambar) : 'https://via.placeholder.com/600x400?text=No+Image' }}" 
+                             alt="{{ $p->nama }}">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">{{ $p->nama }}</h3>
                         <p class="text-muted mb-2">Kategori: {{ $p->kategori->nama ?? '-' }}</p>
-                        <p class="card-text flex-grow-1">{{ Str::limit($p->deskripsi, 120) }}</p>
+                        <p class="card-text">{{ Str::limit($p->deskripsi, 120) }}</p>
                         <div class="mb-2">
-                            <span class="badge bg-{{ $p->stok > 0 ? 'success' : 'danger' }}">
+                            <span class="badge" style="background: {{ $p->stok > 0 ? 'var(--success)' : 'var(--danger)' }}; color: white; padding: 0.25rem 0.5rem; border-radius: 4px;">
                                 Stok: {{ $p->stok }}
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="text-primary mb-0">Rp {{ number_format($p->harga, 0, ',', '.') }}</h5>
-                            <div class="action-buttons">
-                                
+                            <div class="product-actions">
                                 <a href="https://wa.me/{{ $p->toko->kontak ?? '' }}?text={{ urlencode('Halo, saya ingin membeli produk '.$p->nama.' dari toko '.$p->toko->nama) }}"
-                                       target="_blank"
-                                       class="btn btn-sm btn-success"
-                                       title="Chat Penjual">
-                                        <i class="fab fa-whatsapp"></i>
+                                   target="_blank"
+                                   class="btn btn-sm btn-primary"
+                                   title="Chat Penjual">
+                                    <i class="fab fa-whatsapp"></i> Beli
                                 </a>
-                            <a href="{{ route('produk.show', $p->id) }}" class="btn btn-sm btn-outline-info">
-                                <i class="fas fa-eye"></i> Lihat
-                            </a>
-
-                        </div>
-
+                                <a href="{{ route('produk.show', $p->id) }}" class="btn btn-sm btn-outline">
+                                    <i class="fas fa-eye"></i> Detail
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            {{-- Membuat baris baru setiap 4 produk --}}
-            @if(($loop->iteration) % 4 == 0 && !$loop->last)
-                </div><div class="row">
-            @endif
-        @empty
-            <div class="col-12 text-center py-5">
-                <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-                <h4 class="text-muted">Belum ada produk</h4>
-                <p class="text-muted">Silakan tambahkan produk terlebih dahulu di toko Anda.</p>
-            </div>
-        @endforelse
+            @empty
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">Belum ada produk</h4>
+                    <p class="text-muted">Silakan tambahkan produk terlebih dahulu di toko Anda.</p>
+                </div>
+            @endforelse
+        </div>
     </section>
 
     <!-- CTA -->
-    <section class="cta">
+    <section class="cta" id="tentang">
         <div class="cta-content">
-            <h2>Siap Mendukung Kreativitas Siswa?</h2>
-            <p>Bergabunglah dengan komunitas kami dan dapatkan produk berkualitas sambil mendukung bakat siswa</p>
+            <h2>Kami percaya setiap siswa memiliki potensi besar.</h2>
+            <p>Marketplace SMK YPC dibangun sebagai sarana untuk menampilkan karya terbaik mereka kepada publik, mendorong kreativitas, serta membuka peluang usaha bagi generasi muda yang berprestasi.</p>
             <div class="cta-buttons">
-                <a href="#" class="btn btn-white">Lihat Semua Produk</a>
-                <a href="#" class="btn btn-outline" style="color: white; border-color: white;">Daftar Penjual</a>
+                <a href="#produk" class="btn btn-white">Lihat Semua Produk</a>
             </div>
         </div>
     </section>
@@ -662,26 +682,44 @@
     </div>
 
     <script>
-        // Animasi scroll
+        // Sistem Filter Kategori
         document.addEventListener('DOMContentLoaded', function() {
-            // Animasi elemen saat scroll
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
+            const categoryCards = document.querySelectorAll('.category-card');
+            const productItems = document.querySelectorAll('.product-item');
+            
+            // Fungsi filter produk berdasarkan kategori
+            function filterProducts(category) {
+                productItems.forEach(item => {
+                    if (category === 'all') {
+                        item.classList.remove('hidden');
+                    } else {
+                        if (item.getAttribute('data-category') === category) {
+                            item.classList.remove('hidden');
+                        } else {
+                            item.classList.add('hidden');
+                        }
                     }
                 });
+            }
+            
+            // Event listener untuk kategori cards
+            categoryCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // Hapus class active dari semua kategori
+                    categoryCards.forEach(c => c.classList.remove('active'));
+                    
+                    // Tambah class active ke kategori yang dipilih
+                    this.classList.add('active');
+                    
+                    // Filter produk
+                    const selectedCategory = this.getAttribute('data-category');
+                    filterProducts(selectedCategory);
+                    
+                    // Tampilkan toast
+                    showToast(`Menampilkan produk ${this.querySelector('h3').textContent}`);
+                });
             });
-
-            // Atur animasi untuk semua card
-            document.querySelectorAll('.category-card, .product-card').forEach(card => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(30px)';
-                card.style.transition = 'all 0.6s ease';
-                observer.observe(card);
-            });
-
+            
             // Fungsi toast
             function showToast(message) {
                 const toast = document.getElementById('toast');
@@ -690,63 +728,64 @@
                 toast.classList.add('show');
                 setTimeout(() => toast.classList.remove('show'), 3000);
             }
-
-            // Event listener untuk tombol beli
-            document.querySelectorAll('.btn-primary').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    if (this.innerHTML.includes('shopping-cart')) {
-                        e.preventDefault();
-                        const product = this.closest('.product-card').querySelector('.product-title').textContent;
-                        showToast(`${product} ditambahkan ke keranjang!`);
-
-                        // Animasi ikon keranjang
-                        const icon = document.createElement('i');
-                        icon.className = 'fas fa-shopping-cart';
-                        icon.style.cssText = `
-                            position: fixed;
-                            z-index: 10000;
-                            color: var(--secondary);
-                            font-size: 20px;
-                            pointer-events: none;
-                        `;
-                        document.body.appendChild(icon);
-
-                        const startRect = this.getBoundingClientRect();
-                        const endRect = document.querySelector('.auth-section').getBoundingClientRect();
-
-                        icon.animate([
-                            {
-                                left: `${startRect.left}px`,
-                                top: `${startRect.top}px`,
-                                opacity: 1
-                            },
-                            {
-                                left: `${endRect.left}px`,
-                                top: `${endRect.top}px`,
-                                opacity: 0
-                            }
-                        ], {
-                            duration: 1000,
-                            easing: 'ease-out'
-                        });
-
-                        setTimeout(() => document.body.removeChild(icon), 1000);
+            
+            // Animasi scroll
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
                     }
                 });
             });
-
-            // Pencarian
-            document.querySelector('.search-bar button').addEventListener('click', function() {
-                const query = document.querySelector('.search-bar input').value;
+            
+            // Atur animasi untuk semua card
+            document.querySelectorAll('.category-card, .product-card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'all 0.6s ease';
+                observer.observe(card);
+            });
+            
+            // Pencarian produk
+            const searchInput = document.querySelector('.search-bar input');
+            const searchButton = document.querySelector('.search-bar button');
+            
+            function searchProducts() {
+                const query = searchInput.value.toLowerCase().trim();
+                
+                productItems.forEach(item => {
+                    const productName = item.getAttribute('data-name');
+                    const productCategory = item.getAttribute('data-category');
+                    
+                    if (query === '' || 
+                        productName.includes(query) || 
+                        productCategory.includes(query)) {
+                        item.classList.remove('hidden');
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                });
+                
                 if (query) {
                     showToast(`Mencari: ${query}`);
                 }
-            });
-
-            document.querySelector('.search-bar input').addEventListener('keypress', function(e) {
+            }
+            
+            searchButton.addEventListener('click', searchProducts);
+            searchInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
-                    document.querySelector('.search-bar button').click();
+                    searchProducts();
                 }
+            });
+            
+            // Reset filter saat klik "Lihat Semua Produk" di CTA
+            document.querySelector('.cta-buttons .btn-white').addEventListener('click', function(e) {
+                e.preventDefault();
+                categoryCards.forEach(c => c.classList.remove('active'));
+                document.querySelector('[data-category="all"]').classList.add('active');
+                filterProducts('all');
+                showToast('Menampilkan semua produk');
             });
         });
     </script>
