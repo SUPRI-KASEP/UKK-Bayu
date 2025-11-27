@@ -26,39 +26,6 @@ class AdminTokoController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        return view('admin.toko.create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'nama' => 'required|string|max:255',
-            'alamat' => 'required|string',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8',
-        ]);
-
-        // Create user for the seller
-        $user = User::create([
-            'name' => $request->nama,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        // Create toko associated with the user
-        Toko::create([
-            'nama' => $request->nama,
-            'alamat' => $request->alamat,
-            'user_id' => $user->id,
-        ]);
-
-        return redirect()->route('admin.toko.index')->with('success', 'Toko dan akun penjual berhasil ditambahkan.');
-    }
 
     /**
      * Display the specified resource.

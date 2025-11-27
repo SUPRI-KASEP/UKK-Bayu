@@ -7,10 +7,15 @@ use Illuminate\Http\Request;
 
 class showBerandaCon extends Controller
 {
-    //
-    public function show(Produk $produk)
+
+    public function show($id)
     {
-        // $produk = Produk::all();
-        return view('member.show', compact('produk'));
+        $produk = Produk::with(['kategori', 'toko'])
+                    ->whereHas('toko', function($query) {
+                        $query->where('status', 'setuju');
+                    })
+                    ->findOrFail($id);
+
+        return view('show', compact('produk'));
     }
 }

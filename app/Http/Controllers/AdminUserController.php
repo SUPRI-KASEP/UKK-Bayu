@@ -25,70 +25,7 @@ class AdminUserController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        $kategoris = Kategori::all();
-        return view('admin.user.create', compact('kategoris'));
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        // Validasi dasar user
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => 'required|in:user,admin',
-        ]);
-
-        // Jika role adalah user, validasi field toko jika diisi
-        if ($request->role === 'user' && $request->filled('toko_nama')) {
-            $request->validate([
-                'toko_nama' => 'required|string|max:255',
-                'toko_alamat' => 'required|string',
-                'kategori_ids' => 'required|array|min:1',
-                'kategori_ids.*' => 'exists:kategoris,id',
-            ]);
-        }
-
-        DB::transaction(function () use ($request) {
-            // Create user
-            $user = User::create([
-                'name' => $request->name,
-                'username' => $request->username,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'role' => $request->role,
-            ]);
-
-            // Jika user adalah member dan toko diisi, buat toko untuknya
-            if ($request->role === 'user' && $request->filled('toko_nama')) {
-                $toko = Toko::create([
-                    'nama' => $request->toko_nama,
-                    'alamat' => $request->toko_alamat,
-                    'user_id' => $user->id,
-                ]);
-
-                // Simpan kategori yang dipilih
-                if ($request->has('kategori_ids')) {
-                    $toko->kategoris()->attach($request->kategori_ids);
-                }
-            }
-        });
-
-        return redirect()->route('admin.user.index')->with('success', 'User berhasil ditambahkan.');
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         $user = User::with(['toko', 'toko.kategoris'])->findOrFail($id);
@@ -116,86 +53,34 @@ class AdminUserController extends Controller
     {
         $user = User::findOrFail($id);
 
+    // Validasi dasar
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'username' => 'required|string|max:255|unique:users,username,' . $id,
+        'role' => 'required|in:member,admin',
+    ]);
+
+    // Jika password diisi, validasi password dan konfirmasi
+    if ($request->filled('password')) {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users,username,' . $id,
-            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
-            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
-            'role' => 'required|in:user,admin',
+            'password' => ['confirmed', Rules\Password::defaults()],
         ]);
+    }
 
-        // Jika role adalah user dan toko diisi, validasi field toko
-        if ($request->role === 'user' && $request->filled('toko_nama')) {
-            $request->validate([
-                'toko_nama' => 'required|string|max:255',
-                'toko_alamat' => 'required|string',
-                'kategori_ids' => 'required|array|min:1',
-                'kategori_ids.*' => 'exists:kategoris,id',
-            ]);
-        }
+    $data = [
+        'name' => $request->name,
+        'username' => $request->username,
+        'role' => $request->role,
+    ];
 
-        DB::transaction(function () use ($request, $user) {
-            $data = [
-                'name' => $request->name,
-                'username' => $request->username,
-                'email' => $request->email,
-                'role' => $request->role,
-            ];
+    // Hanya update password jika diisi
+    if ($request->filled('password')) {
+        $data['password'] = Hash::make($request->password);
+    }
 
-            if ($request->filled('password')) {
-                $data['password'] = Hash::make($request->password);
-            }
+    $user->update($data);
 
-            $user->update($data);
-
-            // Handle toko untuk user member
-            if ($request->role === 'user') {
-                if ($request->filled('toko_nama')) {
-                    $toko = $user->toko;
-
-                    if ($toko) {
-                        // Update toko yang sudah ada
-                        $toko->update([
-                            'nama' => $request->toko_nama,
-                            'alamat' => $request->toko_alamat,
-                        ]);
-
-                        // Update kategori
-                        if ($request->has('kategori_ids')) {
-                            $toko->kategoris()->sync($request->kategori_ids);
-                        }
-                    } else {
-                        // Buat toko baru
-                        $toko = Toko::create([
-                            'nama' => $request->toko_nama,
-                            'alamat' => $request->toko_alamat,
-                            'user_id' => $user->id,
-                        ]);
-
-                        // Attach kategori
-                        if ($request->has('kategori_ids')) {
-                            $toko->kategoris()->attach($request->kategori_ids);
-                        }
-                    }
-                } else {
-                    // Jika toko tidak diisi, hapus toko jika ada
-                    if ($user->toko) {
-                        // Hapus relasi kategori terlebih dahulu
-                        $user->toko->kategoris()->detach();
-                        $user->toko->delete();
-                    }
-                }
-            } else {
-                // Jika role diubah dari user ke admin, hapus toko jika ada
-                if ($user->toko) {
-                    // Hapus relasi kategori terlebih dahulu
-                    $user->toko->kategoris()->detach();
-                    $user->toko->delete();
-                }
-            }
-        });
-
-        return redirect()->route('admin.user.index')->with('success', 'User berhasil diperbarui.');
+    return redirect()->route('admin.user.index')->with('success', 'User berhasil diperbarui.');
     }
 
     /**

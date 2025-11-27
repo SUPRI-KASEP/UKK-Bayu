@@ -47,11 +47,6 @@ class AdminKategoriController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        $kategori = Kategori::findOrFail($id);
-        return view('admin.kategori.show', compact('kategori'));
-    }
 
     /**
      * Show the form for editing the specified resource.

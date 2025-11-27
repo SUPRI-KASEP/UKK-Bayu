@@ -19,8 +19,8 @@
 
     :root {
       --bg: #f8fafc;
-      --sidebar-bg: #ffffff;
-      --sidebar-text: #334155;
+      --sidebar-bg: #1e293b;
+      --sidebar-text: #ffffff;
       --sidebar-hover: #f1f5f9;
       --text: #475569;
       --card-bg: #ffffff;
@@ -36,6 +36,7 @@
       --table-header-text: #ffffff;
       --table-row-hover: #f8fafc;
       --badge-bg: #64748b;
+      --admin: #ffffff;
     }
 
     body {
@@ -71,7 +72,7 @@
       padding: 1.5rem 0;
       font-size: 1.3rem;
       font-weight: 600;
-      color: var(--judul);
+      color: var(--admin);
       border-bottom: 1px solid var(--border);
     }
 
@@ -352,7 +353,7 @@
       <li><a href="{{ route('admin.produk.index') }}"><i class="fas fa-box"></i><span>Produk</span></a></li>
       <li><a href="{{ route('admin.kategori.index') }}"><i class="fas fa-tags"></i><span>Kategori</span></a></li>
       <li><a href="{{ route('admin.user.index') }}"><i class="fas fa-user"></i><span>User</span></a></li>
-      <li><a href="{{ route('admin.pengajuan') }}"></a></li>
+      <li><a href="{{ route('admin.pengajuan') }}"><i class="fas fa-file-alt"></i><span>Pengajuan</span></a></li>
     </ul>
   </div>
 
@@ -385,7 +386,7 @@
       </p>
       @yield('content')
     </div>
-    
+
   </div>
 
 

@@ -10,20 +10,21 @@ use Illuminate\Support\Facades\Storage;
 
 class MemBerandaCon extends Controller
 {
-    //
     public function index()
     {
         $user = Auth::user();
         $toko = $user->toko;
-        
-        if (!$toko) {
-            return redirect()->route('member.toko')->with('warning', 'Anda harus memiliki toko terlebih dahulu.');
-        }
 
-        $produk = $toko->produks ?? collect();
+        // TIDAK PERLU VALIDASI TOKO - LANGSUNG AMBIL SEMUA PRODUK
+        $produk = Produk::with(['kategori', 'toko.user'])
+                    ->whereHas('toko', function($query) {
+                        $query->where('status', 'setuju'); // Hanya produk dari toko yang disetujui
+                    })
+                    ->latest()
+                    ->get();
+
         $kategoris = Kategori::all();
 
-        return view('member.beranda', compact('toko', 'produk', 'kategoris'));
-
+        return view('member.beranda', compact('toko', 'produk', 'kategoris', 'user'));
     }
 }

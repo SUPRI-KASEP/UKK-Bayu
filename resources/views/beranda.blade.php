@@ -635,7 +635,7 @@
     <nav class="navbar">
         <div class="logo">
             <i class="fas fa-store"></i>
-            <span>Marketplace SMK YPC</span>
+            <span>Marketplace Sekolah</span>
         </div>
         <ul class="nav-links">
             <li><a href="#home">Beranda</a></li>
@@ -653,7 +653,7 @@
     <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero-content">
-            <h1>Karya Kreatif Siswa SMK YPC</h1>
+            <h1>Karya Kreatif Sekolah</h1>
             <p>Temukan produk unik dan berkualitas langsung dari bakat siswa kami</p>
             <div class="search-bar">
                 <input type="text" id="searchInput" placeholder="Cari produk favorit...">
@@ -704,24 +704,24 @@
         <h2 class="section-title">Produk Unggulan</h2>
         <div class="products-grid" id="productsGrid">
             @forelse($produk as $p)
-                <div class="product-card product-item" 
+                <div class="product-card product-item"
                      data-category="{{ strtolower($p->kategori->nama ?? 'lainnya') }}"
                      data-name="{{ strtolower($p->nama) }}"
                      data-price="{{ $p->harga }}">
                     <div class="product-image">
-                        <img src="{{ $p->gambar ? asset('storage/'.$p->gambar) : 'https://via.placeholder.com/600x400?text=No+Image' }}" 
+                        <img src="{{ $p->gambar ? asset('storage/'.$p->gambar) : 'https://via.placeholder.com/600x400?text=No+Image' }}"
                              alt="{{ $p->nama }}">
                     </div>
                     <div class="product-info">
                         <h3 class="product-title">{{ $p->nama }}</h3>
                         <p class="product-category">Kategori: {{ $p->kategori->nama ?? '-' }}</p>
                         <p class="product-description">{{ $p->deskripsi }}</p>
-                        
+
                         <div class="product-stock {{ $p->stok > 0 ? 'stock-available' : 'stock-out' }}">
                             <i class="fas {{ $p->stok > 0 ? 'fa-check' : 'fa-times' }}"></i>
                             Stok: {{ $p->stok }}
                         </div>
-                        
+
                         <div class="product-footer">
                             <div class="product-price">Rp {{ number_format($p->harga, 0, ',', '.') }}</div>
                             <div class="product-actions">
@@ -752,7 +752,7 @@
     <section class="cta" id="tentang">
         <div class="cta-content">
             <h2>Kami percaya setiap siswa memiliki potensi besar.</h2>
-            <p>Marketplace SMK YPC dibangun sebagai sarana untuk menampilkan karya terbaik mereka kepada publik, mendorong kreativitas, serta membuka peluang usaha bagi generasi muda yang berprestasi.</p>
+            <p>Marketplace Sekolah dibangun sebagai sarana untuk menampilkan karya terbaik mereka kepada publik, mendorong kreativitas, serta membuka peluang usaha bagi generasi muda yang berprestasi.</p>
             <div class="cta-buttons">
                 <a href="#produk" class="btn btn-white" id="showAllProducts">
                     <i class="fas fa-th-large"></i> Lihat Semua Produk
@@ -768,8 +768,8 @@
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-column">
-                <h3>Marketplace SMK YPC</h3>
-                <p>Platform jual beli produk karya siswa SMK YPC Tasikmalaya.</p>
+                <h3>Marketplace Sekolah</h3>
+                <p>Platform jual beli produk karya siswa.</p>
                 <div class="social-links">
                     <a href="#"><i class="fab fa-instagram"></i></a>
                     <a href="#"><i class="fab fa-facebook"></i></a>
@@ -789,15 +789,15 @@
             <div class="footer-column">
                 <h3>Kontak</h3>
                 <ul class="footer-links">
-                    <li><i class="fas fa-map-marker-alt"></i> Jl. SMK YPC Tasikmalaya</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Jl. CISINGA</li>
                     <li><i class="fas fa-phone"></i> (0265) 123456</li>
-                    <li><i class="fas fa-envelope"></i> info@smkypc.sch.id</li>
+                    <li><i class="fas fa-envelope"></i> info@sekolah.sch.id</li>
                     <li><i class="fas fa-clock"></i> Senin - Jumat: 08:00 - 16:00</li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 Marketplace SMK YPC. All rights reserved.</p>
+            <p class="mb-0"> &copy; {{ date('Y') }} Beranda. Ayo gabung</p>
         </div>
     </footer>
 
@@ -816,22 +816,22 @@
             const searchButton = document.getElementById('searchButton');
             const showAllProducts = document.getElementById('showAllProducts');
             const productsGrid = document.getElementById('productsGrid');
-            
+
             // Current filter state
             let currentCategory = 'all';
             let currentSearch = '';
-            
+
             // Filter products function
             function filterProducts() {
                 let visibleCount = 0;
-                
+
                 productItems.forEach(item => {
-                    const categoryMatch = currentCategory === 'all' || 
+                    const categoryMatch = currentCategory === 'all' ||
                                         item.getAttribute('data-category') === currentCategory;
-                    const searchMatch = currentSearch === '' || 
+                    const searchMatch = currentSearch === '' ||
                                       item.getAttribute('data-name').includes(currentSearch) ||
                                       item.getAttribute('data-category').includes(currentSearch);
-                    
+
                     if (categoryMatch && searchMatch) {
                         item.classList.remove('hidden');
                         visibleCount++;
@@ -839,7 +839,7 @@
                         item.classList.add('hidden');
                     }
                 });
-                
+
                 // Show no products message if no products visible
                 const noProductsMsg = document.querySelector('.no-products');
                 if (visibleCount === 0 && !noProductsMsg) {
@@ -855,79 +855,79 @@
                     noProductsMsg.remove();
                 }
             }
-            
+
             // Category filter
             categoryCards.forEach(card => {
                 card.addEventListener('click', function() {
                     // Remove active class from all categories
                     categoryCards.forEach(c => c.classList.remove('active'));
-                    
+
                     // Add active class to clicked category
                     this.classList.add('active');
-                    
+
                     // Update current category and filter
                     currentCategory = this.getAttribute('data-category');
                     filterProducts();
-                    
+
                     // Show toast notification
                     showToast(`Menampilkan produk ${this.querySelector('h3').textContent}`);
                 });
             });
-            
+
             // Search functionality
             function performSearch() {
                 currentSearch = searchInput.value.toLowerCase().trim();
                 filterProducts();
-                
+
                 if (currentSearch) {
                     showToast(`Mencari: "${searchInput.value}"`);
                 }
             }
-            
+
             searchButton.addEventListener('click', performSearch);
             searchInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     performSearch();
                 }
             });
-            
+
             // Show all products
             showAllProducts.addEventListener('click', function(e) {
                 e.preventDefault();
-                
+
                 // Reset category filter
                 categoryCards.forEach(c => c.classList.remove('active'));
                 document.querySelector('[data-category="all"]').classList.add('active');
                 currentCategory = 'all';
-                
+
                 // Reset search
                 searchInput.value = '';
                 currentSearch = '';
-                
+
                 // Filter products
                 filterProducts();
-                
+
                 showToast('Menampilkan semua produk');
-                
+
                 // Scroll to products section
-                document.getElementById('produk').scrollIntoView({ 
-                    behavior: 'smooth' 
+                document.getElementById('produk').scrollIntoView({
+                    behavior: 'smooth'
                 });
             });
-            
+
             // Toast notification function
             function showToast(message) {
                 const toast = document.getElementById('toast');
                 const toastMessage = document.getElementById('toastMessage');
-                
+
                 toastMessage.textContent = message;
                 toast.classList.add('show');
-                
+
                 setTimeout(() => {
                     toast.classList.remove('show');
                 }, 3000);
             }
-            
+
             // Scroll animations
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -937,7 +937,7 @@
                     }
                 });
             });
-            
+
             // Animate elements on scroll
             document.querySelectorAll('.category-card, .product-card').forEach(card => {
                 card.style.opacity = '0';
@@ -945,7 +945,7 @@
                 card.style.transition = 'all 0.6s ease';
                 observer.observe(card);
             });
-            
+
             // Smooth scrolling for navigation links
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
@@ -959,7 +959,7 @@
                     }
                 });
             });
-            
+
             // Initialize filter
             filterProducts();
         });

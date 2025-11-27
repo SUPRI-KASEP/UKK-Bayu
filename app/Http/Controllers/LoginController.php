@@ -24,7 +24,7 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-            
+
             // Redirect based on role
             if ($user->role == 'admin') {
                 return redirect()->route('admin.beranda');
@@ -50,7 +50,7 @@ class LoginController extends Controller
         $request->validate([
             'name' => 'required',
             'username' => 'required|unique:users',
-            'password' => 'required|min:6',
+            'password' => 'required|min:8',
         ]);
 
         // GUNAKAN Hash::make() DARI bcrypt()
@@ -69,7 +69,7 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
+
         return redirect()->route('beranda');
     }
 }

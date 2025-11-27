@@ -14,32 +14,32 @@
             margin: 0;
             padding: 0;
         }
-        
+
         body {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
             background-color: #f8f9fa;
         }
-        
+
         main {
             flex: 1;
         }
-        
+
         .navbar-nav .nav-link {
             transition: color 0.3s ease;
         }
-        
+
         .navbar-nav .nav-link:hover {
             color: #d1d5db !important;
         }
-        
+
         /* Styling untuk footer */
         .footer {
             margin-top: auto;
             background-color: #1e293b;
         }
-        
+
         /* Active state untuk navbar */
         .navbar-nav .nav-link.active {
             color: #ffffff !important;
@@ -54,11 +54,11 @@
         <div class="container-fluid">
             {{-- Brand di kiri --}}
             <a class="navbar-brand fw-bold ms-3" href="{{ route('member.beranda') }}">
-                <i class="fas fa-tachometer-alt me-2"></i>Member Dashboard
+                <i class="fas fa-tachometer-alt me-2"></i>Halaman Member
             </a>
 
             {{-- Mobile Toggle Button --}}
-            <button class="navbar-toggler me-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" 
+            <button class="navbar-toggler me-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
                     aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -67,19 +67,19 @@
             <div class="collapse navbar-collapse" id="navbarContent">
                 <div class="navbar-nav ms-auto align-items-center me-3">
                     {{-- Beranda --}}
-                    <a href="{{ route('member.beranda') }}" 
+                    <a href="{{ route('member.beranda') }}"
                        class="nav-link mx-2 {{ request()->routeIs('member.beranda') ? 'active fw-bold' : '' }}">
                         <i class="fas fa-home me-1"></i>Beranda
                     </a>
 
                     {{-- Produk --}}
-                    <a href="{{ route('member.produk') }}" 
+                    <a href="{{ route('member.produk') }}"
                        class="nav-link mx-2 {{ request()->routeIs('member.produk') ? 'active fw-bold' : '' }}">
                         <i class="fas fa-box me-1"></i>Produk
                     </a>
 
                     {{-- Toko --}}
-                    <a href="{{ route('member.toko') }}" 
+                    <a href="{{ route('member.toko') }}"
                        class="nav-link mx-2 {{ request()->routeIs('member.toko') ? 'active fw-bold' : '' }}">
                         <i class="fas fa-store me-1"></i>Toko
                     </a>
@@ -150,7 +150,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     {{-- Additional Scripts --}}
     @stack('scripts')
 </body>

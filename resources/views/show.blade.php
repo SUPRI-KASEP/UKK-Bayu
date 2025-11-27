@@ -180,7 +180,7 @@
                                 </div>
 
                                 <div class="text-center mt-4">
-                                    <a href="{{ route('member.beranda') }}" class="btn btn-back">
+                                    <a href="/" class="btn btn-back">
                                         <i class="fas fa-arrow-left me-2"></i>
                                         Kembali ke Beranda
                                     </a>

@@ -15,24 +15,30 @@ class MemberProdukController extends Controller
      */
     public function index()
     {
-        $toko = Auth::user()->toko;
+        $user = Auth::user();
+        $toko = $user->toko;
 
-        // Toko belum dibuat
+        // Toko belum dibuat - redirect ke beranda dengan warning
         if (!$toko) {
-            return redirect()->route('member.toko')
-                ->with('warning', 'Anda harus membuat toko terlebih dahulu.');
+            return redirect()->route('member.beranda')
+                ->with('warning', 'Anda harus membuat toko terlebih dahulu untuk mengelola produk.');
         }
 
         // Toko belum disetujui admin
         if ($toko->status !== 'setuju') {
-            return redirect()->route('member.toko')
+            return redirect()->route('member.beranda')
                 ->with('warning', 'Toko Anda belum disetujui admin. Anda belum dapat mengelola produk.');
         }
 
-        $produk = Produk::where('toko_id', $toko->id)->get();
+        // Eager loading untuk optimasi query
+        $produk = Produk::with('kategori')
+                    ->where('toko_id', $toko->id)
+                    ->latest()
+                    ->get();
+
         $kategoris = Kategori::all();
 
-        return view('member.produk.dashboard', compact('produk', 'kategoris'));
+        return view('member.produk.dashboard', compact('produk', 'kategoris', 'toko'));
     }
 
     /**
@@ -40,15 +46,21 @@ class MemberProdukController extends Controller
      */
     public function create()
     {
-        $toko = Auth::user()->toko;
+        $user = Auth::user();
+        $toko = $user->toko;
 
-        if (!$toko || $toko->status !== 'setuju') {
-            return redirect()->route('member.toko')
+        if (!$toko) {
+            return redirect()->route('member.beranda')
+                ->with('warning', 'Anda harus membuat toko terlebih dahulu.');
+        }
+
+        if ($toko->status !== 'setuju') {
+            return redirect()->route('member.beranda')
                 ->with('warning', 'Toko Anda belum disetujui admin. Tidak dapat menambahkan produk.');
         }
 
         $kategoris = Kategori::all();
-        return view('member.produk.create', compact('kategoris'));
+        return view('member.produk.create', compact('kategoris', 'toko'));
     }
 
     /**
@@ -56,114 +68,187 @@ class MemberProdukController extends Controller
      */
     public function store(Request $request)
     {
-        $toko = Auth::user()->toko;
+        $user = Auth::user();
+        $toko = $user->toko;
 
-        if (!$toko || $toko->status !== 'setuju') {
-            return redirect()->route('member.toko')
+        if (!$toko) {
+            return redirect()->route('member.beranda')
+                ->with('warning', 'Anda harus membuat toko terlebih dahulu.');
+        }
+
+        if ($toko->status !== 'setuju') {
+            return redirect()->route('member.beranda')
                 ->with('warning', 'Toko Anda belum disetujui admin. Tidak dapat menambahkan produk.');
         }
 
         $request->validate([
             'nama' => 'required|max:255',
-            'deskripsi' => 'required',
-            'harga' => 'required|numeric|min:0',
+            'deskripsi' => 'required|min:10',
+            'harga' => 'required|numeric|min:1000',
             'stok' => 'required|integer|min:0',
-            'kategori_id' => 'required|exists:kategori,id',
+            'kategori_id' => 'required|exists:kategori,id', 
             'gambar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ], [
+            'nama.required' => 'Nama produk wajib diisi',
+            'deskripsi.min' => 'Deskripsi minimal 10 karakter',
+            'harga.min' => 'Harga minimal Rp 1.000',
+            'kategori_id.exists' => 'Kategori yang dipilih tidak valid',
         ]);
 
-        $data = $request->only(['nama', 'deskripsi', 'harga', 'stok', 'kategori_id']);
-        $data['toko_id'] = $toko->id;
+        try {
+            $data = $request->only(['nama', 'deskripsi', 'harga', 'stok', 'kategori_id']);
+            $data['toko_id'] = $toko->id;
 
-        // Upload gambar
-        if ($request->hasFile('gambar')) {
-            $data['gambar'] = $request->file('gambar')->store('produk', 'public');
+            // Upload gambar
+            if ($request->hasFile('gambar')) {
+                $data['gambar'] = $request->file('gambar')->store('produk', 'public');
+            }
+
+            Produk::create($data);
+
+            return redirect()->route('member.produk')
+                ->with('success', 'Produk berhasil ditambahkan!');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-
-        Produk::create($data);
-
-        return redirect()->route('member.produk')->with('success', 'Produk berhasil ditambahkan!');
     }
 
     /**
      * Detail produk
      */
-    public function show(Produk $produk)
+    public function show($id)
     {
-        // Tidak boleh lihat produk toko lain
-        if ($produk->toko_id !== Auth::user()->toko->id) {
-            abort(403);
-        }
+        $user = Auth::user();
+        $toko = $user->toko;
 
-        return view('member.produk.show', compact('produk'));
+
+        $produk = Produk::with(['kategori', 'toko'])
+                    ->whereHas('toko', function($query) {
+                         $query->where('status', 'setuju');
+                    })
+                    ->findOrFail($id);
+
+        return view('member.show', compact('produk', 'toko', 'user'));
     }
 
     /**
      * Form edit produk
      */
-    public function edit(Produk $produk)
+    public function edit($id)
     {
-        if ($produk->toko_id !== Auth::user()->toko->id) {
-            abort(403);
+        $user = Auth::user();
+        $toko = $user->toko;
+
+        if (!$toko) {
+            abort(403, 'Anda tidak memiliki toko.');
+        }
+
+        $produk = Produk::findOrFail($id);
+
+        // Validasi kepemilikan produk
+        if ($produk->toko_id !== $toko->id) {
+            abort(403, 'Anda tidak memiliki akses ke produk ini.');
         }
 
         $kategoris = Kategori::all();
-        return view('member.produk.edit', compact('produk', 'kategoris'));
+        return view('member.produk.edit', compact('produk', 'kategoris', 'toko'));
     }
 
     /**
      * Update produk
      */
-    public function update(Request $request, Produk $produk)
+    public function update(Request $request, $id)
     {
-        if ($produk->toko_id !== Auth::user()->toko->id) {
-            abort(403);
+        $user = Auth::user();
+        $toko = $user->toko;
+
+        if (!$toko) {
+            abort(403, 'Anda tidak memiliki toko.');
+        }
+
+        $produk = Produk::findOrFail($id);
+
+        // Validasi kepemilikan produk
+        if ($produk->toko_id !== $toko->id) {
+            abort(403, 'Anda tidak memiliki akses ke produk ini.');
         }
 
         $request->validate([
             'nama' => 'required|max:255',
-            'deskripsi' => 'required',
-            'harga' => 'required|numeric|min:0',
+            'deskripsi' => 'required|min:10',
+            'harga' => 'required|numeric|min:1000',
             'stok' => 'required|integer|min:0',
             'kategori_id' => 'required|exists:kategori,id',
             'gambar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ], [
+            'nama.required' => 'Nama produk wajib diisi',
+            'deskripsi.min' => 'Deskripsi minimal 10 karakter',
+            'harga.min' => 'Harga minimal Rp 1.000',
+            'kategori_id.exists' => 'Kategori yang dipilih tidak valid',
         ]);
 
-        $data = $request->only(['nama', 'deskripsi', 'harga', 'stok', 'kategori_id']);
+        try {
+            $data = $request->only(['nama', 'deskripsi', 'harga', 'stok', 'kategori_id']);
 
-        // Ganti gambar jika ada file baru
-        if ($request->hasFile('gambar')) {
+            // Ganti gambar jika ada file baru
+            if ($request->hasFile('gambar')) {
+                // Hapus gambar lama jika ada
+                if ($produk->gambar) {
+                    Storage::disk('public')->delete($produk->gambar);
+                }
 
-            // Hapus gambar lama
-            if ($produk->gambar) {
-                Storage::disk('public')->delete($produk->gambar);
+                // Upload gambar baru
+                $data['gambar'] = $request->file('gambar')->store('produk', 'public');
             }
 
-            // Upload gambar baru
-            $data['gambar'] = $request->file('gambar')->store('produk', 'public');
+            $produk->update($data);
+
+            return redirect()->route('member.produk')
+                ->with('success', 'Produk berhasil diperbarui!');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-
-        $produk->update($data);
-
-        return redirect()->route('member.produk')->with('success', 'Produk berhasil diperbarui!');
     }
 
     /**
      * Hapus produk
      */
-    public function destroy(Produk $produk)
+    public function destroy($id)
     {
-        if ($produk->toko_id !== Auth::user()->toko->id) {
-            abort(403);
+        $user = Auth::user();
+        $toko = $user->toko;
+
+        if (!$toko) {
+            abort(403, 'Anda tidak memiliki toko.');
         }
 
-        // Hapus gambar
-        if ($produk->gambar) {
-            Storage::disk('public')->delete($produk->gambar);
+        $produk = Produk::findOrFail($id);
+
+        // Validasi kepemilikan produk
+        if ($produk->toko_id !== $toko->id) {
+            abort(403, 'Anda tidak memiliki akses ke produk ini.');
         }
 
-        $produk->delete();
+        try {
 
-        return redirect()->route('member.produk')->with('success', 'Produk berhasil dihapus!');
+            if ($produk->gambar) {
+                Storage::disk('public')->delete($produk->gambar);
+            }
+
+            $produk->delete();
+
+            return redirect()->route('member.produk')
+                ->with('success', 'Produk berhasil dihapus!');
+
+        } catch (\Exception $e) {
+            return redirect()->route('member.produk')
+                ->with('error', 'Terjadi kesalahan saat menghapus produk: ' . $e->getMessage());
+        }
     }
 }
